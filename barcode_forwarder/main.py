@@ -44,7 +44,7 @@ if __name__ == '__main__':
     logging.getLogger("barcode_forwarder").setLevel(log_level)
 
     barcode_reader = BarcodeReader(config)
-    webserver = Webserver(config)
+    webserver = Webserver(config, barcode_reader)
 
     logging.debug("Starting...")
 

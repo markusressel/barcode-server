@@ -21,6 +21,7 @@ class BarcodeReader:
     def __init__(self, config: AppConfig):
         self.config = config
         self.devices = []
+        self.listeners = set()
 
     async def start(self):
         self.running = True
@@ -36,6 +37,8 @@ class BarcodeReader:
                 if barcode is not None:
                     SCAN_COUNT.inc()
                     LOGGER.debug(f"{d.name} ({d.path}): {barcode}")
+                    for listener in self.listeners:
+                        await listener(d, barcode)
 
     async def stop(self):
         self.running = False
@@ -88,3 +91,10 @@ class BarcodeReader:
                 else:
                     # append the current character
                     result += keycode[4:]
+
+    def add_listener(self, listener: callable):
+        """
+        Add a barcode event listener
+        :param listener: async callable taking two arguments
+        """
+        self.listeners.add(listener)
