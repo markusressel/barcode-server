@@ -28,11 +28,22 @@ programs. To prevent this:
 
 Create a file `/etc/udev/rules.d/10-barcode.rules`:
 ```
-SUBSYSTEM=="input", ACTION=="add", ATTRS{idVendor}=="xxxx", ATTRS{idProduct}=="yyy", RUN+="/bin/sh -c 'echo remove > /sys$env{DEVPATH}/uevent'"
-ACTION=="add", ATTRS{idVendor}=="xxxx", ATTRS{idProduct}=="yyyy", SYMLINK+="barcode"
+SUBSYSTEM=="input", ACTION=="add", ATTRS{idVendor}=="xxxx", ATTRS{idProduct}=="yyyy", RUN+="/bin/sh -c 'echo remove > /sys$env{DEVPATH}/uevent'"
+SUBSYSTEM=="input", ACTION=="add", ATTRS{idVendor}=="xxxx", ATTRS{idProduct}=="yyyy", DEVPATH=="*:1.0/*", KERNEL=="event*", RUN+="/bin/sh -c 'ln -sf /dev/input/$kernel /dev/input/barcode_scanner'"
 ```
-Replace the `idVendor` and `idProduct` values with the values of your barcode reader.
-You can find them in the log output of **barcode-reader**.
+Replace the `idVendor` and `idProduct` values with the values of your barcode reader (a 4 digit hex value with leading zeros).
+You can find them in the log output of **barcode-reader** or using `lsusb` with the wireless receiver attached to your computer.
+
+Reload udev rules using:
+```
+udevadm control --reload
+```
+then remove and reinsert the wireless receiver.
+You should now have a symlink in `/dev/input/barcode_scanner`:
+```
+ls -lha /dev/input/barcode_scanner
+```
+which can be used in the `device_paths` section of the **barcode-forwarder** config.
 
 Source: [This](https://serverfault.com/questions/385260/bind-usb-keyboard-exclusively-to-specific-application/976557#976557)
 and [That](https://stackoverflow.com/questions/63478999/how-to-make-linux-ignore-a-keyboard-while-keeping-it-available-for-my-program-to/63531743#63531743)

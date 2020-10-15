@@ -49,7 +49,7 @@ class BarcodeReader:
                         continue
                     LOGGER.info(
                         f"Reading: {d.path}: Name: {d.name}, "
-                        f"Vendor: {d.info.vendor}, Product: {d.info.product}")
+                        f"Vendor: {d.info.vendor:04x}, Product: {d.info.product:04x}")
                     task = asyncio.create_task(self._start_reader(d))
                     self._device_tasks[path] = task
 
@@ -77,10 +77,10 @@ class BarcodeReader:
         """
         Detects barcode USB devices
         """
-        self.devices = self._find_devices(self.config.DEVICE_PATTERNS.value)
+        self.devices = self._find_devices(self.config.DEVICE_PATTERNS.value, self.config.DEVICE_PATHS.value)
 
     @staticmethod
-    def _find_devices(patterns: List) -> Dict[str, InputDevice]:
+    def _find_devices(patterns: List, paths: List[str]) -> Dict[str, InputDevice]:
         """
         # Finds the input device with the name ".*Barcode Reader.*".
         # Could and should be parameterized, of course. Device name as cmd line parameter, perhaps?
@@ -92,6 +92,7 @@ class BarcodeReader:
         devices = evdev.list_devices()
         # create InputDevice instances
         devices = [evdev.InputDevice(fn) for fn in devices]
+        devices += [evdev.InputDevice(fn) for fn in paths]
 
         # search for device name
         for d in devices:

@@ -16,6 +16,7 @@ import logging
 import re
 
 from container_app_conf import ConfigBase
+from container_app_conf.entry.file import FileConfigEntry
 from container_app_conf.entry.int import IntConfigEntry
 from container_app_conf.entry.list import ListConfigEntry
 from container_app_conf.entry.regex import RegexConfigEntry
@@ -86,7 +87,16 @@ class AppConfig(ConfigBase):
             CONFIG_NODE_ROOT,
             "devices"
         ],
-        default=[re.compile(".*Barcode.*", flags=re.IGNORECASE)]
+        default=[]
+    )
+
+    DEVICE_PATHS = ListConfigEntry(
+        item_type=FileConfigEntry,
+        key_path=[
+            CONFIG_NODE_ROOT,
+            "device_paths"
+        ],
+        default=[]
     )
 
     STATS_PORT = IntConfigEntry(
@@ -97,3 +107,8 @@ class AppConfig(ConfigBase):
         ],
         default=8000
     )
+
+    def validate(self):
+        super(AppConfig, self).validate()
+        if len(self.DEVICE_PATHS.value) == len(self.DEVICE_PATTERNS.value) == 0:
+            raise AssertionError("You must provide at least one device pattern or device_path!")

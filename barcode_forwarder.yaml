@@ -5,8 +5,10 @@ barcode_forwarder:
     port: 9654
     ssl: False
     api_token: "EmUSqjXGfnQwn5wn6CpzJRZgoazMTRbMNgH7CXwkQG7Ph7stex"
-  devices:
-    - ".*Barcode.*"
+#  devices:
+#    - ".*Barcode.*"
+  device_paths:
+    - "/dev/input/barcode_scanner"
   targets:
 
   stats:
