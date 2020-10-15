@@ -3,6 +3,8 @@ import logging
 import os
 import sys
 
+from prometheus_client import start_http_server
+
 from barcode_forwarder.barcode import BarcodeReader
 from barcode_forwarder.config import AppConfig
 from barcode_forwarder.webserver import Webserver
@@ -45,6 +47,10 @@ if __name__ == '__main__':
     webserver = Webserver(config)
 
     logging.debug("Starting...")
+
+    # start prometheus server
+    LOGGER.info("Starting statistics webserver...")
+    start_http_server(config.STATS_PORT.value)
 
     tasks = asyncio.gather(
         barcode_reader.start(),

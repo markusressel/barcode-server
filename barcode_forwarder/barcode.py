@@ -6,6 +6,7 @@ import evdev
 from evdev import *
 
 from barcode_forwarder.config import AppConfig
+from barcode_forwarder.stats import SCAN_COUNT
 
 LOGGER = logging.getLogger(__name__)
 
@@ -32,7 +33,9 @@ class BarcodeReader:
 
             for d in self.devices:
                 barcode = await self._read_line(d)
-                LOGGER.debug(f"{d.name} ({d.path}): {barcode}")
+                if barcode is not None:
+                    SCAN_COUNT.inc()
+                    LOGGER.debug(f"{d.name} ({d.path}): {barcode}")
 
     async def stop(self):
         self.running = False
