@@ -1,5 +1,6 @@
 import asyncio
 import logging
+from pathlib import Path
 from typing import List, Dict
 
 import evdev
@@ -27,9 +28,15 @@ class BarcodeReader:
         self._device_tasks = {}
 
     async def start(self):
+        """
+        Start detecting and reading barcode scanner devices
+        """
         self._main_task = asyncio.create_task(self._detect_and_read())
 
     async def stop(self):
+        """
+        Stop detecting and reading barcode scanner devices
+        """
         if self._main_task is None:
             return
 
@@ -40,6 +47,9 @@ class BarcodeReader:
         self._main_task = None
 
     async def _detect_and_read(self):
+        """
+        Detect barcode scanner devices and start readers for them
+        """
         while True:
             try:
                 self._detect_devices()
@@ -56,19 +66,25 @@ class BarcodeReader:
                 await asyncio.sleep(1)
             except Exception as e:
                 logging.exception(e)
+                await asyncio.sleep(10)
 
-    async def _start_reader(self, d):
+    async def _start_reader(self, input_device):
+        """
+        Start a reader for a specific device
+        :param input_device: the input device
+        """
         while True:
             try:
-                barcode = await self._read_line(d)
+                barcode = await self._read_line(input_device)
                 if barcode is not None:
                     SCAN_COUNT.inc()
-                    LOGGER.debug(f"{d.name} ({d.path}): {barcode}")
+                    LOGGER.debug(f"{input_device.name} ({input_device.path}): {barcode}")
                     for listener in self.listeners:
-                        await listener(d, barcode)
+                        await listener(input_device, barcode)
             except Exception as e:
                 LOGGER.exception(e)
-                await asyncio.sleep(5)
+                self._device_tasks.pop(input_device.path)
+                break
 
     def _detect_devices(self):
         """
@@ -90,11 +106,18 @@ class BarcodeReader:
         # create InputDevice instances
         devices = [evdev.InputDevice(fn) for fn in devices]
 
-        # search for device name
-        devices = list(filter(lambda x: any(map(lambda y: y.match(d.name), patterns)), devices))
+        # filter by device name
+        devices = list(filter(lambda d: any(map(lambda y: y.match(d.name), patterns)), devices))
 
         # add manually defined paths
-        devices += [evdev.InputDevice(fn) for fn in paths]
+        for path in paths:
+            try:
+                if Path(path).exists():
+                    devices.append(evdev.InputDevice(path))
+                else:
+                    logging.warning(f"Path doesn't exist: {path}")
+            except Exception as e:
+                logging.exception(e)
 
         for d in devices:
             result[d.path] = d
