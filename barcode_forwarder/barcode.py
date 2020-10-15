@@ -70,9 +70,6 @@ class BarcodeReader:
                 LOGGER.exception(e)
                 await asyncio.sleep(5)
 
-    async def stop(self):
-        self.running = False
-
     def _detect_devices(self):
         """
         Detects barcode USB devices
@@ -92,12 +89,15 @@ class BarcodeReader:
         devices = evdev.list_devices()
         # create InputDevice instances
         devices = [evdev.InputDevice(fn) for fn in devices]
-        devices += [evdev.InputDevice(fn) for fn in paths]
 
         # search for device name
+        devices = list(filter(lambda x: any(map(lambda y: y.match(d.name), patterns)), devices))
+
+        # add manually defined paths
+        devices += [evdev.InputDevice(fn) for fn in paths]
+
         for d in devices:
-            if any(map(lambda x: x.match(d.name), patterns)):
-                result[d.path] = d
+            result[d.path] = d
 
         return result
 
