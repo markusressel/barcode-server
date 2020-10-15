@@ -6,6 +6,14 @@ A simple daemon to read barcodes from a USB Barcode Scanner and forward them to 
 
 ## Docker
 
+When starting the docker container, make sure to pass though input devices:
+```
+docker run
+  --name barcode \
+  --device=/dev/input
+  markusressel/barcode-forwarder
+```
+
 Ensure the user running this application is in the correct group for accessing
 input devices (usually `input`), like this:
 ```

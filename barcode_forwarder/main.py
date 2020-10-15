@@ -5,10 +5,6 @@ import sys
 
 from prometheus_client import start_http_server
 
-from barcode_forwarder.barcode import BarcodeReader
-from barcode_forwarder.config import AppConfig
-from barcode_forwarder.webserver import Webserver
-
 """
 Simple script to read barcodes from a USB connected barcode reader.
 
@@ -38,6 +34,10 @@ logging.basicConfig(level=logging.WARNING, format='%(asctime)s - %(name)s - %(le
 LOGGER = logging.getLogger(__name__)
 
 if __name__ == '__main__':
+    from barcode_forwarder.barcode import BarcodeReader
+    from barcode_forwarder.config import AppConfig
+    from barcode_forwarder.webserver import Webserver
+
     config = AppConfig()
 
     log_level = logging._nameToLevel.get(str(config.LOG_LEVEL.value).upper(), config.LOG_LEVEL.default)
