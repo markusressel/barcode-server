@@ -1,9 +1,9 @@
 barcode_forwarder:
   server:
     host: "127.0.0.1"
-    port: 9465
+    port: 9654
     ssl: False
-    api_token: "aNce5oBYPGw5arHimifSLpQhGGW74ZPSUfsLC6TjJ46GnSn9xdXfLuexmHpm4pHddmXXcmwuE5Kbqb88VmZzD67CDbrMDKpSTRUVEZfRL9xVSvP3r33MpKXHntYrG9V9"
+    api_token: "EmUSqjXGfnQwn5wn6CpzJRZgoazMTRbMNgH7CXwkQG7Ph7stex"
   devices:
     - "Barcode/i"
   stats:
