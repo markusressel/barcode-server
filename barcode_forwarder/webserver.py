@@ -27,6 +27,7 @@ class Webserver:
         self.barcode_reader.add_listener(self.on_barcode)
 
     async def start(self):
+        await self.barcode_reader.start()
         LOGGER.info("Starting webserver...")
         return await websockets.serve(self.connection_handler, self.host, self.port)
 

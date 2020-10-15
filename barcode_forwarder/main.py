@@ -53,10 +53,10 @@ if __name__ == '__main__':
     start_http_server(config.STATS_PORT.value)
 
     tasks = asyncio.gather(
-        barcode_reader.start(),
         webserver.start()
     )
 
     asyncio.get_event_loop().run_until_complete(tasks)
+    asyncio.get_event_loop().run_forever()
 
     logging.debug("Exiting...")
