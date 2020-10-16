@@ -25,7 +25,11 @@ docker run
 
 Normally the barcode reader works like any keyboard, meaning its input is
 evaluated by the system, which can clutter up your TTY or other open
-programs. To prevent this:
+programs. **barcode-server** will try to _grab_ input devices, making it the sole recipient of all
+incoming input events from those devices, which should prevent the device from cluttering
+your TTY.
+
+If, for some reason, this does not work for you, have try this:
 
 Create a file `/etc/udev/rules.d/10-barcode.rules`:
 ```

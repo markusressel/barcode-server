@@ -73,18 +73,20 @@ class BarcodeReader:
         Start a reader for a specific device
         :param input_device: the input device
         """
-        while True:
+        try:
+            # become the sole recipient of all incoming input events
+            input_device.grab()
+            barcode = await self._read_line(input_device)
+            if barcode is not None and len(barcode) > 0:
+                await self._notify_listeners(input_device, barcode)
+        except Exception as e:
+            LOGGER.exception(e)
             try:
-                barcode = await self._read_line(input_device)
-                if barcode is not None:
-                    SCAN_COUNT.inc()
-                    LOGGER.debug(f"{input_device.name} ({input_device.path}): {barcode}")
-                    for listener in self.listeners:
-                        await listener(input_device, barcode)
+                # release device
+                input_device.ungrab()
             except Exception as e:
-                LOGGER.exception(e)
-                self._device_tasks.pop(input_device.path)
-                break
+                pass
+            self._device_tasks.pop(input_device.path)
 
     def _detect_devices(self):
         """
@@ -124,13 +126,13 @@ class BarcodeReader:
 
         return result
 
-    @staticmethod
-    async def _read_line(input_device: InputDevice):
+    async def _read_line(self, input_device: InputDevice):
         """
         Read a single line (ENTER stops input) from the given device
         :param input_device: the device to listen on
         :return: a barcode
         """
+        # TODO: this chops of input sometimes, needs investigation
         result = ""
         # read device events
         async for event in input_device.async_read_loop():
@@ -149,3 +151,14 @@ class BarcodeReader:
         :param listener: async callable taking two arguments
         """
         self.listeners.add(listener)
+
+    async def _notify_listeners(self, input_device: InputDevice, barcode: str):
+        """
+        Notifies all listeners about the scanned barcode
+        :param input_device: device that scanned the barcode
+        :param barcode: the barcode
+        """
+        SCAN_COUNT.inc()
+        LOGGER.debug(f"{input_device.name} ({input_device.path}): {barcode}")
+        for listener in self.listeners:
+            await listener(input_device, barcode)

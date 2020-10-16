@@ -8,7 +8,7 @@ barcode_server:
   devices:
     - ".*Barcode.*"
   device_paths:
-#    - "/dev/input/barcode_scanner"
+    - "/dev/input/barcode_scanner"
   targets:
 
   stats:
