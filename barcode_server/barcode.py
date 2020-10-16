@@ -76,17 +76,19 @@ class BarcodeReader:
         try:
             # become the sole recipient of all incoming input events
             input_device.grab()
-            barcode = await self._read_line(input_device)
-            if barcode is not None and len(barcode) > 0:
-                await self._notify_listeners(input_device, barcode)
+            while True:
+                barcode = await self._read_line(input_device)
+                if barcode is not None and len(barcode) > 0:
+                    asyncio.ensure_future(self._notify_listeners(input_device, barcode))
         except Exception as e:
             LOGGER.exception(e)
+            self._device_tasks.pop(input_device.path)
+        finally:
             try:
                 # release device
                 input_device.ungrab()
             except Exception as e:
                 pass
-            self._device_tasks.pop(input_device.path)
 
     def _detect_devices(self):
         """
