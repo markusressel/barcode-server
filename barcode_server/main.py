@@ -34,14 +34,14 @@ logging.basicConfig(level=logging.WARNING, format='%(asctime)s - %(name)s - %(le
 LOGGER = logging.getLogger(__name__)
 
 if __name__ == '__main__':
-    from barcode_forwarder.barcode import BarcodeReader
-    from barcode_forwarder.config import AppConfig
-    from barcode_forwarder.webserver import Webserver
+    from barcode_server.barcode import BarcodeReader
+    from barcode_server.config import AppConfig
+    from barcode_server.webserver import Webserver
 
     config = AppConfig()
 
     log_level = logging._nameToLevel.get(str(config.LOG_LEVEL.value).upper(), config.LOG_LEVEL.default)
-    logging.getLogger("barcode_forwarder").setLevel(log_level)
+    logging.getLogger("barcode_server").setLevel(log_level)
 
     barcode_reader = BarcodeReader(config)
     webserver = Webserver(config, barcode_reader)

@@ -1,4 +1,4 @@
-# Docker image for barcode-forwarder
+# Docker image for barcode-server
 
 FROM python:3.8
 
@@ -10,4 +10,4 @@ RUN pip install --upgrade pip
 RUN pip install pipenv
 RUN pipenv install --system --deploy
 
-CMD [ "python", "./barcode_forwarder/main.py" ]
+CMD [ "python", "./barcode_server/main.py" ]

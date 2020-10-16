@@ -6,8 +6,8 @@ from typing import List, Dict
 import evdev
 from evdev import *
 
-from barcode_forwarder.config import AppConfig
-from barcode_forwarder.stats import SCAN_COUNT
+from barcode_server.config import AppConfig
+from barcode_server.stats import SCAN_COUNT
 
 LOGGER = logging.getLogger(__name__)
 

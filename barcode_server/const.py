@@ -13,7 +13,7 @@
 #  You should have received a copy of the GNU Affero General Public License
 #  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-CONFIG_NODE_ROOT = "barcode_forwarder"
+CONFIG_NODE_ROOT = "barcode_server"
 
 CONFIG_NODE_SERVER = "server"
 

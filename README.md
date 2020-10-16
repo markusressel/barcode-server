@@ -1,4 +1,4 @@
-# barcode-forwarder
+# barcode-server
 
 A simple daemon to read barcodes from a USB Barcode Scanner and forward them to some other service.
 
@@ -17,7 +17,7 @@ When starting the docker container, make sure to pass though input devices:
 docker run
   --name barcode \
   --device=/dev/input
-  markusressel/barcode-forwarder
+  markusressel/barcode-server
 ```
 
 ## Block keyboard input
@@ -43,7 +43,7 @@ You should now have a symlink in `/dev/input/barcode_scanner`:
 ```
 ls -lha /dev/input/barcode_scanner
 ```
-which can be used in the `device_paths` section of the **barcode-forwarder** config.
+which can be used in the `device_paths` section of the **barcode-server** config.
 
 Source: [This](https://serverfault.com/questions/385260/bind-usb-keyboard-exclusively-to-specific-application/976557#976557)
 and [That](https://stackoverflow.com/questions/63478999/how-to-make-linux-ignore-a-keyboard-while-keeping-it-available-for-my-program-to/63531743#63531743)
@@ -57,7 +57,7 @@ bugs and new features and comment on the ones that you are interested in.
 # License
 
 ```text
-barcode-forwarder is free software: you can redistribute it and/or modify
+barcode-server is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation, either version 3 of the License, or
 (at your option) any later version.

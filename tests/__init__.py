@@ -22,13 +22,13 @@ import unittest
 
 
 class TestBase(unittest.TestCase):
-    from barcode_forwarder.config import AppConfig
+    from barcode_server.config import AppConfig
     from container_app_conf.source.yaml_source import YamlSource
 
     # load config from test folder
     config = AppConfig(
         singleton=True,
         data_sources=[
-            YamlSource("barcode_forwarder", "./tests/")
+            YamlSource("barcode_server", "./tests/")
         ]
     )

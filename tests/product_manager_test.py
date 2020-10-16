@@ -1,5 +1,5 @@
-from barcode_forwarder.barcode import BarcodeReader
-from barcode_forwarder.config import AppConfig
+from barcode_server.barcode import BarcodeReader
+from barcode_server.config import AppConfig
 from tests import TestBase
 
 

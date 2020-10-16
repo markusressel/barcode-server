@@ -5,8 +5,8 @@ import orjson
 import websockets
 from evdev import InputDevice
 
-from barcode_forwarder.barcode import BarcodeReader
-from barcode_forwarder.config import AppConfig
+from barcode_server.barcode import BarcodeReader
+from barcode_server.config import AppConfig
 
 LOGGER = logging.getLogger(__name__)
 

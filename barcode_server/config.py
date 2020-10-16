@@ -26,7 +26,7 @@ from container_app_conf.source.toml_source import TomlSource
 from container_app_conf.source.yaml_source import YamlSource
 from py_range_parse import Range
 
-from barcode_forwarder.const import *
+from barcode_server.const import *
 
 
 class AppConfig(ConfigBase):
