@@ -7,6 +7,7 @@ import evdev
 from evdev import *
 
 from barcode_server.config import AppConfig
+from barcode_server.keyevent_reader import KeyEventReader
 from barcode_server.stats import SCAN_COUNT
 
 LOGGER = logging.getLogger(__name__)
@@ -23,6 +24,8 @@ class BarcodeReader:
         self.config = config
         self.devices = {}
         self.listeners = set()
+
+        self._keyevent_reader = KeyEventReader()
 
         self._main_task = None
         self._device_tasks = {}
@@ -79,7 +82,7 @@ class BarcodeReader:
             while True:
                 barcode = await self._read_line(input_device)
                 if barcode is not None and len(barcode) > 0:
-                    asyncio.ensure_future(self._notify_listeners(input_device, barcode))
+                    asyncio.create_task(self._notify_listeners(input_device, barcode))
         except Exception as e:
             LOGGER.exception(e)
             self._device_tasks.pop(input_device.path)
@@ -128,24 +131,13 @@ class BarcodeReader:
 
         return result
 
-    async def _read_line(self, input_device: InputDevice):
+    async def _read_line(self, input_device: InputDevice) -> str or None:
         """
         Read a single line (ENTER stops input) from the given device
         :param input_device: the device to listen on
         :return: a barcode
         """
-        # TODO: this chops of input sometimes, needs investigation
-        result = ""
-        # read device events
-        async for event in input_device.async_read_loop():
-            if event.type == evdev.ecodes.EV_KEY and event.value == 1:
-                keycode = categorize(event).keycode
-                if keycode == 'KEY_ENTER':
-                    # line is finished
-                    return result
-                else:
-                    # append the current character
-                    result += keycode[4:]
+        return await self._keyevent_reader.read_line(input_device)
 
     def add_listener(self, listener: callable):
         """
