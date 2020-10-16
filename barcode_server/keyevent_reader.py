@@ -29,8 +29,7 @@ class KeyEventReader:
                 event = categorize(event)
                 if isinstance(event, KeyEvent):
                     if await self._on_key_event(event):
-                        print(self._line)
-                        self._line = ""
+                        return self._line
 
     async def _on_key_event(self, event: KeyEvent) -> bool:
         # if event.type == evdev.ecodes.EV_KEY and event.value == 1:
