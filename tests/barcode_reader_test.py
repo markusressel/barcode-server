@@ -3,7 +3,7 @@ from barcode_server.config import AppConfig
 from tests import TestBase
 
 
-class ProductManagerTest(TestBase):
+class BarcodeReaderTest(TestBase):
 
     def test_initialization(self):
         config = AppConfig()
