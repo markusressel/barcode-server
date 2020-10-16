@@ -1,6 +1,7 @@
 # barcode-server
 
-A simple daemon to read barcodes from a USB Barcode Scanner and forward them to some other service.
+A simple daemon to read barcodes from a USB Barcode Scanner
+and expose them to other service using a websocket API.
 
 # How to use
 
