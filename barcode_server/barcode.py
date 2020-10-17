@@ -1,6 +1,5 @@
 import asyncio
 import logging
-from concurrent.futures.thread import ThreadPoolExecutor
 from pathlib import Path
 from typing import List, Dict
 

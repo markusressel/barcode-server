@@ -1,6 +1,8 @@
 import asyncio
+import atexit
 import logging
 import os
+import signal
 import sys
 
 from prometheus_client import start_http_server
@@ -33,10 +35,20 @@ sys.path.append(parent_dir)
 logging.basicConfig(level=logging.WARNING, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 LOGGER = logging.getLogger(__name__)
 
+loop = asyncio.get_event_loop()
+
+
+def signal_handler(signal=None, frame=None):
+    LOGGER.info("Exiting...")
+    os._exit(0)
+
+
 if __name__ == '__main__':
     from barcode_server.barcode import BarcodeReader
     from barcode_server.config import AppConfig
     from barcode_server.webserver import Webserver
+
+    signal.signal(signal.SIGINT, signal_handler)
 
     config = AppConfig()
 
@@ -56,7 +68,5 @@ if __name__ == '__main__':
         webserver.start()
     )
 
-    asyncio.get_event_loop().run_until_complete(tasks)
-    asyncio.get_event_loop().run_forever()
-
-    logging.debug("Exiting...")
+    loop.run_until_complete(tasks)
+    loop.run_forever()
