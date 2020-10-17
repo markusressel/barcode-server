@@ -1,5 +1,6 @@
 import asyncio
 import logging
+from concurrent.futures.thread import ThreadPoolExecutor
 from pathlib import Path
 from typing import List, Dict
 
@@ -17,8 +18,6 @@ class BarcodeReader:
     """
     Reads barcodes from a USB barcode scanner
     """
-
-    running = False
 
     def __init__(self, config: AppConfig):
         self.config = config
@@ -137,7 +136,13 @@ class BarcodeReader:
         :param input_device: the device to listen on
         :return: a barcode
         """
-        return await self._keyevent_reader.read_line(input_device)
+        # Using a thread executor here is a workaround for
+        # input_device.async_read_loop() skipping input events sometimes,
+        # so we use a synchronous method instead.
+        # While not perfect, it has a much higher success rate.
+        loop = asyncio.get_event_loop()
+        result = await loop.run_in_executor(None, self._keyevent_reader.read_line, input_device)
+        return result
 
     def add_listener(self, listener: callable):
         """
@@ -153,6 +158,6 @@ class BarcodeReader:
         :param barcode: the barcode
         """
         SCAN_COUNT.inc()
-        LOGGER.debug(f"{input_device.name} ({input_device.path}): {barcode}")
+        LOGGER.info(f"{input_device.name} ({input_device.path}): {barcode}")
         for listener in self.listeners:
             await listener(input_device, barcode)

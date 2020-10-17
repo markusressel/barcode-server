@@ -17,21 +17,25 @@ class KeyEventReader:
 
         self._line = ""
 
-    async def read_line(self, input_device: InputDevice) -> str:
+    def read_line(self, input_device: InputDevice) -> str:
+        """
+        Reads a line
+        :param input_device: the device to read from
+        :return: line
+        """
         self._line = ""
-        # read device events
-        while True:
-            # TODO: while there is a function called async_read_loop, it tends
-            #  to skip input events, so we use the non-async read-loop here.
-            #  This probably makes it impossible to read multiple devices simultaneous though,
-            #  since it is blocking code :(
-            for event in input_device.read_loop():
-                event = categorize(event)
-                if isinstance(event, KeyEvent):
-                    if await self._on_key_event(event):
-                        return self._line
+        # While there is a function called async_read_loop, it tends
+        # to skip input events, so we use the non-async read-loop here.
 
-    async def _on_key_event(self, event: KeyEvent) -> bool:
+        # async for event in input_device.async_read_loop():
+        for event in input_device.read_loop():
+            event = categorize(event)
+            if isinstance(event, KeyEvent):
+                if self._on_key_event(event):
+                    return self._line
+
+    def _on_key_event(self, event: KeyEvent) -> bool:
+        LOGGER.debug(str(event))
         # if event.type == evdev.ecodes.EV_KEY and event.value == 1:
         if event.keycode == "KEY_ENTER" or event.keycode == "KEY_KPENTER":
             if event.keystate == event.key_up:
@@ -96,7 +100,5 @@ class KeyEventReader:
 
             # append the current character
             self._line += character
-            # self._line += chr(event.scancode + 73)
-            LOGGER.debug(str(event))
 
         return False

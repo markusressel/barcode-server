@@ -1,14 +1,14 @@
 barcode_server:
-  log_level: DEBUG
+  log_level: INFO
   server:
     host: "127.0.0.1"
     port: 9654
     ssl: False
     api_token: "EmUSqjXGfnQwn5wn6CpzJRZgoazMTRbMNgH7CXwkQG7Ph7stex"
   devices:
-    #- ".*Barcode.*"
+    - ".*Barcode.*"
   device_paths:
-    - "/dev/input/barcode_scanner"
+    #- "/dev/input/barcode_scanner"
   targets:
 
   stats:
