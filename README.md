@@ -1,9 +1,11 @@
 # barcode-server
 
-A simple daemon to read barcodes from a USB Barcode Scanner
+A simple daemon to read barcodes from USB Barcode Scanners
 and expose them to other service using a websocket API.
 
 # How to use
+
+## Device Access Permissions
 
 Ensure the user running this application is in the correct group for accessing
 input devices (usually `input`), like this:
@@ -21,15 +23,39 @@ docker run
   markusressel/barcode-server
 ```
 
-## Block keyboard input
+The service will expose a websocket on the port specified in the config. To test
+things out you can connect to it using f.ex.:
 
-Normally the barcode reader works like any keyboard, meaning its input is
-evaluated by the system, which can clutter up your TTY or other open
-programs. **barcode-server** will try to _grab_ input devices, making it the sole recipient of all
+```
+> websocat ws://127.0.0.1:9654 --header "X-Auth-Token:EmUSqjXGfnQwn5wn6CpzJRZgoazMTRbMNgH7CXwkQG7Ph7stex"
+{"device":{"name":"BARCODE SCANNER BARCODE SCANNER","path":"/dev/input/event3","vendorId":65535,"productId":53},"barcode":"D-t38409355843o52230Lm54784"}
+{"device":{"name":"BARCODE SCANNER BARCODE SCANNER","path":"/dev/input/event3","vendorId":65535,"productId":53},"barcode":"4250168519463"}
+```
+
+Messages received on this websocket are JSON formatted strings with the following format:
+```json
+{
+  "device": {
+    "name": "BARCODE SCANNER BARCODE SCANNER", // The name of the device
+    "path": "/dev/input/event3",               // The file path that events are read from
+    "vendorId": "ffff",                        // The device vendor ID
+    "productId": "0035",                       // The device product ID
+  },
+  "barcode": "4250168519463"                   // The line of text that was parsed from input events
+}
+```
+
+# FAQ
+
+## Can I lock the Barcode Scanner to this application?
+
+Most barcode readers normally work like a keyboard, resulting in their input being evaluated by
+the system, which can clutter up your TTY or other open programs.
+**barcode-server** will try to _grab_ input devices, making it the sole recipient of all
 incoming input events from those devices, which should prevent the device from cluttering
 your TTY.
 
-If, for some reason, this does not work for you, have try this:
+If, for some reason, this does not work for you, try this:
 
 Create a file `/etc/udev/rules.d/10-barcode.rules`:
 ```

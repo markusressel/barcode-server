@@ -69,14 +69,14 @@ class AppConfig(ConfigBase):
         range=Range(1, 65534),
         default=9465)
 
-    # SERVER_API_TOKEN = StringConfigEntry(
-    #     key_path=[
-    #         CONFIG_NODE_ROOT,
-    #         CONFIG_NODE_SERVER,
-    #         "api_token"
-    #     ],
-    #     required=True
-    # )
+    SERVER_API_TOKEN = StringConfigEntry(
+        key_path=[
+            CONFIG_NODE_ROOT,
+            CONFIG_NODE_SERVER,
+            "api_token"
+        ],
+        required=True
+    )
 
     DEVICE_PATTERNS = ListConfigEntry(
         item_type=RegexConfigEntry,

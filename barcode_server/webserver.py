@@ -1,14 +1,35 @@
 import logging
-from typing import Dict
+from http import HTTPStatus
+from typing import Dict, Optional, Callable, Awaitable, Any
 
 import orjson
 import websockets
 from evdev import InputDevice
+from websockets import WebSocketServerProtocol, WebSocketServer
+from websockets.http import Headers
+from websockets.server import HTTPResponse
 
 from barcode_server.barcode import BarcodeReader
 from barcode_server.config import AppConfig
+from barcode_server.const import X_Auth_Token
 
 LOGGER = logging.getLogger(__name__)
+
+
+class CustomProtocol(WebSocketServerProtocol):
+
+    def __init__(self, ws_handler: Callable[["WebSocketServerProtocol", str], Awaitable[Any]],
+                 ws_server: "WebSocketServer", **kwargs: Any):
+        super().__init__(ws_handler, ws_server, **kwargs)
+
+    def process_request(
+            self, path: str, request_headers: Headers
+    ) -> Optional[HTTPResponse]:
+        config = AppConfig()
+        if X_Auth_Token not in request_headers.keys() \
+                or request_headers[X_Auth_Token] != config.SERVER_API_TOKEN.value:
+            LOGGER.warning(f"Rejecting unauthorized connection: {self.remote_address[0]}:{self.remote_address[1]}")
+            return HTTPStatus.UNAUTHORIZED, request_headers
 
 
 class Webserver:
@@ -29,7 +50,8 @@ class Webserver:
     async def start(self):
         await self.barcode_reader.start()
         LOGGER.info("Starting webserver...")
-        return await websockets.serve(self.connection_handler, self.host, self.port)
+        return await websockets.serve(self.connection_handler, self.host, self.port,
+                                      create_protocol=CustomProtocol)
 
     async def connection_handler(self, websocket, path):
         self.clients.add(websocket)
@@ -53,8 +75,8 @@ class Webserver:
                 "device": {
                     "name": device.name,
                     "path": device.path,
-                    "vendorId": device.info.vendor,
-                    "productId": device.info.product,
+                    "vendorId": f"{device.info.vendor: 04x}",
+                    "productId": f"{device.info.product: 04x}",
                 },
                 "barcode": barcode
             }
