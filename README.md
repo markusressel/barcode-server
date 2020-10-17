@@ -36,12 +36,12 @@ Messages received on this websocket are JSON formatted strings with the followin
 ```json
 {
   "device": {
-    "name": "BARCODE SCANNER BARCODE SCANNER", // The name of the device
-    "path": "/dev/input/event3",               // The file path that events are read from
-    "vendorId": "ffff",                        // The device vendor ID
-    "productId": "0035",                       // The device product ID
+    "name": "BARCODE SCANNER BARCODE SCANNER",
+    "path": "/dev/input/event3",
+    "vendorId": "ffff",
+    "productId": "0035",
   },
-  "barcode": "4250168519463"                   // The line of text that was parsed from input events
+  "barcode": "4250168519463"
 }
 ```
 
