@@ -3,6 +3,8 @@
 A simple daemon to read barcodes from USB Barcode Scanners
 and expose them to other service using a websocket API.
 
+[![asciicast](https://asciinema.org/a/366004.svg)](https://asciinema.org/a/366004)
+
 # How to use
 
 ## Device Access Permissions
