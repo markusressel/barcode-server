@@ -25,15 +25,10 @@ docker run
   markusressel/barcode-server
 ```
 
+# API
+
 By default the service will expose a websocket on `127.0.0.1` on port `9654`.
 When specified in the config, an API token is required to authorize clients, which must be passed using a `X-Auth-Token` header when connecting.
-To test things out you can use f.ex. `websocat`:
-
-```
-> websocat ws://127.0.0.1:9654 --header "X-Auth-Token:EmUSqjXGfnQwn5wn6CpzJRZgoazMTRbMNgH7CXwkQG7Ph7stex"
-{"device":{"name":"BARCODE SCANNER BARCODE SCANNER","path":"/dev/input/event3","vendorId":65535,"productId":53},"barcode":"D-t38409355843o52230Lm54784"}
-{"device":{"name":"BARCODE SCANNER BARCODE SCANNER","path":"/dev/input/event3","vendorId":65535,"productId":53},"barcode":"4250168519463"}
-```
 
 Messages received on this websocket are JSON formatted strings with the following format:
 ```json
@@ -46,6 +41,14 @@ Messages received on this websocket are JSON formatted strings with the followin
   },
   "barcode": "4250168519463"
 }
+```
+
+To test things out you can use f.ex. `websocat`:
+
+```
+> websocat ws://127.0.0.1:9654 --header "X-Auth-Token:EmUSqjXGfnQwn5wn6CpzJRZgoazMTRbMNgH7CXwkQG7Ph7stex"
+{"device":{"name":"BARCODE SCANNER BARCODE SCANNER","path":"/dev/input/event3","vendorId":65535,"productId":53},"barcode":"D-t38409355843o52230Lm54784"}
+{"device":{"name":"BARCODE SCANNER BARCODE SCANNER","path":"/dev/input/event3","vendorId":65535,"productId":53},"barcode":"4250168519463"}
 ```
 
 # FAQ
