@@ -25,8 +25,9 @@ docker run
   markusressel/barcode-server
 ```
 
-The service will expose a websocket on the port specified in the config. To test
-things out you can connect to it using f.ex.:
+By default the service will expose a websocket on `127.0.0.1` on port `9654`.
+When specified in the config, an API token is required to authorize clients, which must be passed using a `X-Auth-Token` header when connecting.
+To test things out you can use f.ex. `websocat`:
 
 ```
 > websocat ws://127.0.0.1:9654 --header "X-Auth-Token:EmUSqjXGfnQwn5wn6CpzJRZgoazMTRbMNgH7CXwkQG7Ph7stex"
