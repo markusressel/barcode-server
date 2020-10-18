@@ -17,11 +17,11 @@ sudo usermod -a -G input myusername
 
 ## Docker
 
-When starting the docker container, make sure to pass though input devices:
+When starting the docker container, make sure to pass through input devices:
 ```
 docker run
   --name barcode \
-  --device=/dev/input
+  --device=/dev/input \
   markusressel/barcode-server
 ```
 
