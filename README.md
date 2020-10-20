@@ -14,6 +14,26 @@ input devices (usually `input`), like this:
 ```
 sudo usermod -a -G input myusername
 ```
+## Native
+
+```
+# clone repo
+git clone https://github.com/markusressel/barcode-server.git
+# enter repo folder
+cd barcode-server
+# create venv
+python -m venv ./venv
+# enter venv
+source ./venv/bin/activate
+# install pipenv
+pip install pipenv
+# use pipenv to install dependencies
+pipenv sync
+# exit venv
+deactivate
+# launch application
+./venv/bin/python3 ./barcode_server/main.py
+```
 
 ## Docker
 
@@ -24,6 +44,10 @@ docker run \
   --device=/dev/input \
   markusressel/barcode-server
 ```
+**Note:** Although **barcode-server** will continuously try to detect new devices,
+even when passing through `/dev/input` like shown above, new devices can not be detected
+due to the way docker works. If you need to detect devices in real-time, you have to use
+the native approach.
 
 ## Websocket API
 
