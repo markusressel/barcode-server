@@ -29,6 +29,7 @@ docker run
 
 By default the service will expose a websocket on `127.0.0.1` on port `9654`.
 When specified in the config, an API token is required to authorize clients, which must be passed using a `X-Auth-Token` header when connecting.
+Since barcode-scanner is stateless, the token is specified in the configuration file.
 
 Messages received on this websocket are JSON formatted strings with the following format:
 ```json
