@@ -11,7 +11,7 @@ from barcode_server.config import AppConfig
 from barcode_server.const import X_Auth_Token
 from barcode_server.notifier.http import HttpNotifier
 from barcode_server.notifier.mqtt import MQTTNotifier
-from barcode_server.util import barcode_event_to_json
+from barcode_server.util import barcode_event_to_json, input_device_to_dict
 
 LOGGER = logging.getLogger(__name__)
 routes = web.RouteTableDef()
@@ -53,7 +53,7 @@ class Webserver:
 
     async def start(self):
         await self.barcode_reader.start()
-        LOGGER.info("Starting webserver...")
+        LOGGER.info(f"Starting webserver on {self.config.SERVER_HOST.value}:{self.config.SERVER_PORT.value} ...")
 
         app = web.Application(middlewares=[self.authentication_middleware])
         app.add_routes(routes)
@@ -74,16 +74,17 @@ class Webserver:
     async def authentication_middleware(self, request, handler):
         if X_Auth_Token not in request.headers.keys() \
                 or request.headers[X_Auth_Token] != self.config.SERVER_API_TOKEN.value:
-            LOGGER.warning(f"Rejecting unauthorized connection: {self.remote_address[0]}:{self.remote_address[1]}")
+            LOGGER.warning(f"Rejecting unauthorized connection: {request.host}")
             return web.HTTPUnauthorized()
 
         return await handler(self, request)
 
     @routes.get("/devices")
     async def devices_handle(self, request):
-        name = request.match_info.get('name', "Anonymous")
-        text = "Hello, " + name
-        return web.Response(text=text)
+        import orjson
+        device_list = list(map(input_device_to_dict, self.barcode_reader.devices.values()))
+        json = orjson.dumps(device_list)
+        return web.Response(body=json, content_type="application/json")
 
     @routes.get("/")
     async def websocket_handler(self, request):
