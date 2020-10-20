@@ -49,6 +49,16 @@ even when passing through `/dev/input` like shown above, new devices can not be 
 due to the way docker works. If you need to detect devices in real-time, you have to use
 the native approach.
 
+# Webserver
+
+By default the webserver will listen to `127.0.0.1` on port `9654`.
+
+## Authorization
+
+When specified in the config, an API token is required to authorize clients, which must
+be passed using a `X-Auth-Token` header when connecting. Since barcode-scanner doesn't rely on any
+persistence, the token is specified in the configuration file and can not be changed on runtime.
+
 ## Rest API
 
 **barcode-server** provides a simple REST API to get some basic information.
@@ -61,9 +71,8 @@ the approaches described below.
 
 ## Websocket API
 
-By default the service will expose a websocket on `127.0.0.1` on port `9654`.
-When specified in the config, an API token is required to authorize clients, which must be passed using a `X-Auth-Token` header when connecting.
-Since barcode-scanner is stateless, the token is specified in the configuration file.
+In addition to the REST API **barcode-server** also exposes a websocket at `/`, which can be used
+to get realtime barcode scan events.
 
 Messages received on this websocket are JSON formatted strings with the following format:
 ```json
@@ -78,7 +87,7 @@ Messages received on this websocket are JSON formatted strings with the followin
 }
 ```
 
-To test things out you can use f.ex. `websocat`:
+To test the connection you can use f.ex. `websocat`:
 
 ```
 > websocat ws://127.0.0.1:9654 --header "X-Auth-Token:EmUSqjXGfnQwn5wn6CpzJRZgoazMTRbMNgH7CXwkQG7Ph7stex"
@@ -88,8 +97,9 @@ To test things out you can use f.ex. `websocat`:
 
 ## HTTP Post
 
-When configured, you can let **barcode-scanner** issue a HTTP request (defaults to `POST`) when a barcode is scanned.
-The body of the request will contain the same JSON as in the websocket API example.
+When configured, you can let **barcode-scanner** issue a HTTP request (defaults to `POST`) when a
+barcode is scanned, which provides the ability to push barcode events to a server that is unaware
+of any client. The body of the request will contain the same JSON as in the websocket API example.
 
 To do this simply add the following section to your config:
 ```yaml
