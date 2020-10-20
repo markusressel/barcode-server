@@ -54,7 +54,7 @@ To test things out you can use f.ex. `websocat`:
 
 ## HTTP Post
 
-When configured, you can let **barcode-scanner** issue a `POST` request when a barcode is scanned.
+When configured, you can let **barcode-scanner** issue a HTTP request (defaults to `POST`) when a barcode is scanned.
 The body of the request will contain the same JSON as in the websocket API example.
 
 To do this simply add the following section to your config:
