@@ -49,6 +49,16 @@ even when passing through `/dev/input` like shown above, new devices can not be 
 due to the way docker works. If you need to detect devices in real-time, you have to use
 the native approach.
 
+## Rest API
+
+**barcode-server** provides a simple REST API to get some basic information.
+This API can **not** be used to retrieve barcode events. To do that you have to use one of
+the approaches described below.
+
+| Endpoint   | Description                               |
+|------------|-------------------------------------------|
+| `/devices` | A list of all currently detected devices. |
+
 ## Websocket API
 
 By default the service will expose a websocket on `127.0.0.1` on port `9654`.

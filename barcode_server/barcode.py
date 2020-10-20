@@ -8,7 +8,7 @@ from evdev import *
 
 from barcode_server.config import AppConfig
 from barcode_server.keyevent_reader import KeyEventReader
-from barcode_server.stats import SCAN_COUNT
+from barcode_server.stats import SCAN_COUNT, DEVICES_COUNT
 
 LOGGER = logging.getLogger(__name__)
 
@@ -96,6 +96,7 @@ class BarcodeReader:
         Detects barcode USB devices
         """
         self.devices = self._find_devices(self.config.DEVICE_PATTERNS.value, self.config.DEVICE_PATHS.value)
+        DEVICES_COUNT.set(len(self.devices))
 
     @staticmethod
     def _find_devices(patterns: List, paths: List[str]) -> Dict[str, InputDevice]:
