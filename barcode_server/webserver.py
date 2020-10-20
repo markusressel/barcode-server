@@ -13,6 +13,7 @@ from barcode_server.barcode import BarcodeReader
 from barcode_server.config import AppConfig
 from barcode_server.const import X_Auth_Token
 from barcode_server.notifier.http import HttpNotifier
+from barcode_server.notifier.mqtt import MQTTNotifier
 from barcode_server.util import barcode_event_to_json
 
 LOGGER = logging.getLogger(__name__)
@@ -54,6 +55,19 @@ class Webserver:
                 config.HTTP_URL.value,
                 config.HTTP_HEADERS.value)
             self.notifiers.append(http_notifier)
+
+        if config.MQTT_HOST.value is not None:
+            mqtt_notifier = MQTTNotifier(
+                host=config.MQTT_HOST.value,
+                port=config.MQTT_PORT.value,
+                client_id=config.MQTT_CLIENT_ID.value,
+                user=config.MQTT_USER.value,
+                password=config.MQTT_PASSWORD.value,
+                topic=config.MQTT_TOPIC.value,
+                qos=config.MQTT_QOS.value,
+                retain=config.MQTT_RETAIN.value,
+            )
+            self.notifiers.append(mqtt_notifier)
 
     async def start(self):
         await self.barcode_reader.start()

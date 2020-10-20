@@ -24,6 +24,6 @@ class HttpNotifier(BarcodeNotifier):
             async with aiohttp.ClientSession() as session:
                 async with session.request(self.method, self.url, headers=self.headers, data=json) as resp:
                     resp.raise_for_status()
-                LOGGER.debug(f"Notified {self.url}")
+                LOGGER.debug(f"Notified {self.url}: {barcode}")
         except Exception as e:
             LOGGER.exception(e)
