@@ -210,7 +210,8 @@ class AppConfig(ConfigBase):
             CONFIG_NODE_STATS,
             CONFIG_NODE_PORT
         ],
-        default=8000
+        default=8000,
+        required=False
     )
 
     def validate(self):

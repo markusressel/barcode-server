@@ -5,6 +5,18 @@ and expose them to other service using a websocket API.
 
 [![asciicast](https://asciinema.org/a/366004.svg)](https://asciinema.org/a/366004)
 
+# Features
+
+* [x] Autodetect Barcode Scanner devices on the fly
+* [x] Request Server information via REST API
+* [x] Subscribe to barcode events using
+    * [x] Websocket API
+* [x] Push barcode events using
+    * [x] [HTTP requests](#http-request)
+    * [x] [MQTT messages](#mqtt-publish)
+* [x] Get statistics via Prometheus exporter
+
+
 # How to use
 
 ## Device Access Permissions
@@ -95,7 +107,7 @@ To test the connection you can use f.ex. `websocat`:
 {"device":{"name":"BARCODE SCANNER BARCODE SCANNER","path":"/dev/input/event3","vendorId":65535,"productId":53},"barcode":"4250168519463"}
 ```
 
-## HTTP Post
+## HTTP Request
 
 When configured, you can let **barcode-scanner** issue a HTTP request (defaults to `POST`) when a
 barcode is scanned, which provides the ability to push barcode events to a server that is unaware
@@ -125,6 +137,10 @@ barcode_server:
 ```
 
 Have a look at the [example config](barcode_server.yaml) for more options.
+
+## Statistics
+
+**barcode-server** exposes a prometheus exporter (defaults to port `8000`) to give some statistical insight.
 
 # FAQ
 
