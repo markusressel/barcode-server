@@ -86,7 +86,7 @@ Have a look at the [example config](barcode_server.yaml) for more options.
 
 ## Can I lock the Barcode Scanner to this application?
 
-Most barcode readers normally work like a keyboard, resulting in their input being evaluated by
+Yes. Most barcode readers normally work like a keyboard, resulting in their input being evaluated by
 the system, which can clutter up your TTY or other open programs.
 **barcode-server** will try to _grab_ input devices, making it the sole recipient of all
 incoming input events from those devices, which should prevent the device from cluttering
