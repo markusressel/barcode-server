@@ -6,8 +6,8 @@ WORKDIR /app
 
 COPY . .
 
-RUN pip install --upgrade pip
-RUN pip install pipenv
-RUN pipenv install --system --deploy
+RUN pip install --upgrade pip;\
+    pip install pipenv;\
+    pipenv install --system --deploy
 
 CMD [ "python", "./barcode_server/main.py" ]
