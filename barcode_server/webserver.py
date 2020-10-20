@@ -1,8 +1,8 @@
+import asyncio
 import logging
 from http import HTTPStatus
-from typing import Dict, Optional, Callable, Awaitable, Any
+from typing import Optional, Callable, Awaitable, Any
 
-import orjson
 import websockets
 from evdev import InputDevice
 from websockets import WebSocketServerProtocol, WebSocketServer
@@ -12,6 +12,8 @@ from websockets.server import HTTPResponse
 from barcode_server.barcode import BarcodeReader
 from barcode_server.config import AppConfig
 from barcode_server.const import X_Auth_Token
+from barcode_server.notifier.http import HttpNotifier
+from barcode_server.util import barcode_event_to_json
 
 LOGGER = logging.getLogger(__name__)
 
@@ -44,6 +46,15 @@ class Webserver:
         self.barcode_reader = barcode_reader
         self.barcode_reader.add_listener(self.on_barcode)
 
+        self.notifiers = [
+        ]
+        if config.HTTP_URL.value is not None:
+            http_notifier = HttpNotifier(
+                config.HTTP_METHOD.value,
+                config.HTTP_URL.value,
+                config.HTTP_HEADERS.value)
+            self.notifiers.append(http_notifier)
+
     async def start(self):
         await self.barcode_reader.start()
         LOGGER.info("Starting webserver...")
@@ -65,15 +76,9 @@ class Webserver:
             LOGGER.debug(f"Client disconnected: {websocket.remote_address}")
 
     async def on_barcode(self, device: InputDevice, barcode: str):
+        for notifier in self.notifiers:
+            asyncio.create_task(notifier.notify(device, barcode))
+
         for client in self.clients:
-            event = {
-                "device": {
-                    "name": device.name,
-                    "path": device.path,
-                    "vendorId": f"{device.info.vendor: 04x}",
-                    "productId": f"{device.info.product: 04x}",
-                },
-                "barcode": barcode
-            }
-            json = orjson.dumps(event)
-            await client.send(json)
+            json = barcode_event_to_json(device, barcode)
+            asyncio.create_task(client.send(json))

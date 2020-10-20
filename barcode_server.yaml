@@ -5,9 +5,14 @@ barcode_server:
     port: 9654
     ssl: False
     api_token: "EmUSqjXGfnQwn5wn6CpzJRZgoazMTRbMNgH7CXwkQG7Ph7stex"
+  http:
+    url: "http://dummy.restapiexample.com/api/v1/create"
+    method: POST
+    headers:
+      - "X-Auth-Token: MY_HEADERS"
   devices:
     - ".*Barcode.*"
   device_paths:
-    #- "/dev/input/barcode_scanner"
+  #- "/dev/input/barcode_scanner"
   stats:
     port: 8000

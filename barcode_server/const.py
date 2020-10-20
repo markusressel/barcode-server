@@ -18,6 +18,7 @@ X_Auth_Token = "X-Auth-Token"
 CONFIG_NODE_ROOT = "barcode_server"
 
 CONFIG_NODE_SERVER = "server"
+CONFIG_NODE_HTTP = "http"
 
 CONFIG_NODE_STATS = "stats"
 CONFIG_NODE_PORT = "port"
