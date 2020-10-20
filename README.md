@@ -25,7 +25,7 @@ docker run
   markusressel/barcode-server
 ```
 
-# Websocket API
+## Websocket API
 
 By default the service will expose a websocket on `127.0.0.1` on port `9654`.
 When specified in the config, an API token is required to authorize clients, which must be passed using a `X-Auth-Token` header when connecting.
@@ -52,7 +52,7 @@ To test things out you can use f.ex. `websocat`:
 {"device":{"name":"BARCODE SCANNER BARCODE SCANNER","path":"/dev/input/event3","vendorId":65535,"productId":53},"barcode":"4250168519463"}
 ```
 
-# HTTP Post
+## HTTP Post
 
 When configured, you can let **barcode-scanner** issue a `POST` request when a barcode is scanned.
 The body of the request will contain the same JSON as in the websocket API example.
@@ -67,7 +67,7 @@ barcode_server:
 
 Have a look at the [example config](barcode_server.yaml) for more options.
 
-# MQTT Publish
+## MQTT Publish
 
 When configured, you can let **barcode-scanner** publish barcode events to a MQTT broker.
 The payload of the message will contain the same JSON as in the websocket API example.
