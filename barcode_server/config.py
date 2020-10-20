@@ -78,6 +78,36 @@ class AppConfig(ConfigBase):
         required=True
     )
 
+    HTTP_METHOD = StringConfigEntry(
+        key_path=[
+            CONFIG_NODE_ROOT,
+            CONFIG_NODE_HTTP,
+            "method"
+        ],
+        required=True,
+        default="POST",
+        regex="GET|POST|PUT|PATCH"
+    )
+
+    HTTP_URL = StringConfigEntry(
+        key_path=[
+            CONFIG_NODE_ROOT,
+            CONFIG_NODE_HTTP,
+            "url"
+        ],
+        required=False
+    )
+
+    HTTP_HEADERS = ListConfigEntry(
+        item_type=StringConfigEntry,
+        key_path=[
+            CONFIG_NODE_ROOT,
+            CONFIG_NODE_HTTP,
+            "headers"
+        ],
+        default=[]
+    )
+
     DEVICE_PATTERNS = ListConfigEntry(
         item_type=RegexConfigEntry,
         item_args={

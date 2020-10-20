@@ -8,6 +8,7 @@ container-app-conf = ">=5.0.0"
 evdev = "*"
 orjson = ">=3,<4"
 websockets = "*"
+aiohttp = "*"
 prometheus-client = "*"
 
 [dev-packages]

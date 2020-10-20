@@ -159,4 +159,4 @@ class BarcodeReader:
         SCAN_COUNT.inc()
         LOGGER.info(f"{input_device.name} ({input_device.path}): {barcode}")
         for listener in self.listeners:
-            await listener(input_device, barcode)
+            asyncio.create_task(listener(input_device, barcode))

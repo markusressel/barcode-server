@@ -52,6 +52,21 @@ To test things out you can use f.ex. `websocat`:
 {"device":{"name":"BARCODE SCANNER BARCODE SCANNER","path":"/dev/input/event3","vendorId":65535,"productId":53},"barcode":"4250168519463"}
 ```
 
+# HTTP Post
+
+When configured, you can let **barcode-scanner** issue a `POST` request when a barcode is scanned.
+The body of the request will contain the same JSON as in the websocket API example.
+
+To do this simply add the following section to your config:
+```yaml
+barcode_server:
+  [...]
+  http:
+    url: "https://my.domain.com/barcode"
+```
+
+Have a look at the [example config](barcode_server.yaml) for more options.
+
 # FAQ
 
 ## Can I lock the Barcode Scanner to this application?
