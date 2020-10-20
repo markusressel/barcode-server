@@ -5,12 +5,14 @@ import aiohttp
 from aiohttp import web
 from aiohttp.web_middlewares import middleware
 from evdev import InputDevice
+from prometheus_async.aio import time
 
 from barcode_server.barcode import BarcodeReader
 from barcode_server.config import AppConfig
-from barcode_server.const import X_Auth_Token
+from barcode_server.const import *
 from barcode_server.notifier.http import HttpNotifier
 from barcode_server.notifier.mqtt import MQTTNotifier
+from barcode_server.stats import REST_TIME_DEVICES, WEBSOCKET_CLIENT_COUNT, WEBSOCKET_NOTIFIER_TIME
 from barcode_server.util import barcode_event_to_json, input_device_to_dict
 
 LOGGER = logging.getLogger(__name__)
@@ -79,7 +81,8 @@ class Webserver:
 
         return await handler(self, request)
 
-    @routes.get("/devices")
+    @routes.get(f"/{ENDPOINT_DEVICES}")
+    @time(REST_TIME_DEVICES)
     async def devices_handle(self, request):
         import orjson
         device_list = list(map(input_device_to_dict, self.barcode_reader.devices.values()))
@@ -92,7 +95,9 @@ class Webserver:
         await websocket.prepare(request)
 
         self.clients.add(websocket)
-        LOGGER.debug(f"New client connected: {request.host} Client count: {len(self.clients)}")
+        client_count = len(self.clients)
+        WEBSOCKET_CLIENT_COUNT.set(client_count)
+        LOGGER.debug(f"New client connected: {request.host} Client count: {client_count}")
         try:
             async for msg in websocket:
                 if msg.type == aiohttp.WSMsgType.TEXT:
@@ -107,13 +112,18 @@ class Webserver:
             LOGGER.exception(e)
         finally:
             self.clients.discard(websocket)
+            client_count = len(self.clients)
+            WEBSOCKET_CLIENT_COUNT.set(client_count)
             LOGGER.debug(f"Client disconnected: {request.host}")
         return websocket
 
     async def on_barcode(self, device: InputDevice, barcode: str):
         for notifier in self.notifiers:
             asyncio.create_task(notifier.notify(device, barcode))
+        await self._notify_websocket_clients(device, barcode)
 
+    @time(WEBSOCKET_NOTIFIER_TIME)
+    async def _notify_websocket_clients(self, device, barcode):
         for client in self.clients:
             json = barcode_event_to_json(device, barcode)
             asyncio.create_task(client.send_str(json))

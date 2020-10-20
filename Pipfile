@@ -10,6 +10,7 @@ orjson = ">=3,<4"
 aiohttp = "*"
 asyncio-mqtt = "*"
 prometheus-client = "*"
+prometheus_async = "*"
 
 [dev-packages]
 pytest = "*"

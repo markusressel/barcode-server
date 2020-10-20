@@ -25,3 +25,5 @@ CONFIG_NODE_STATS = "stats"
 CONFIG_NODE_PORT = "port"
 
 DEFAULT_SERVER_HOST = "localhost"
+
+ENDPOINT_DEVICES = "devices"
