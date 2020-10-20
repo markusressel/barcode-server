@@ -1,5 +1,4 @@
 import asyncio
-import atexit
 import logging
 import os
 import signal
@@ -61,11 +60,12 @@ if __name__ == '__main__':
     logging.debug("Starting...")
 
     # start prometheus server
-    LOGGER.info("Starting statistics webserver...")
-    start_http_server(config.STATS_PORT.value)
+    if config.STATS_PORT.value is not None:
+        LOGGER.info("Starting statistics webserver...")
+        start_http_server(config.STATS_PORT.value)
 
     tasks = asyncio.gather(
-        webserver.start()
+        webserver.start(),
     )
 
     loop.run_until_complete(tasks)

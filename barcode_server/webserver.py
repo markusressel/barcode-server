@@ -1,38 +1,20 @@
 import asyncio
 import logging
-from http import HTTPStatus
-from typing import Optional, Callable, Awaitable, Any
 
-import websockets
+import aiohttp
+from aiohttp import web
+from aiohttp.web_middlewares import middleware
 from evdev import InputDevice
-from websockets import WebSocketServerProtocol, WebSocketServer
-from websockets.http import Headers
-from websockets.server import HTTPResponse
 
 from barcode_server.barcode import BarcodeReader
 from barcode_server.config import AppConfig
 from barcode_server.const import X_Auth_Token
 from barcode_server.notifier.http import HttpNotifier
 from barcode_server.notifier.mqtt import MQTTNotifier
-from barcode_server.util import barcode_event_to_json
+from barcode_server.util import barcode_event_to_json, input_device_to_dict
 
 LOGGER = logging.getLogger(__name__)
-
-
-class CustomProtocol(WebSocketServerProtocol):
-
-    def __init__(self, ws_handler: Callable[["WebSocketServerProtocol", str], Awaitable[Any]],
-                 ws_server: "WebSocketServer", **kwargs: Any):
-        super().__init__(ws_handler, ws_server, **kwargs)
-
-    def process_request(
-            self, path: str, request_headers: Headers
-    ) -> Optional[HTTPResponse]:
-        config = AppConfig()
-        if X_Auth_Token not in request_headers.keys() \
-                or request_headers[X_Auth_Token] != config.SERVER_API_TOKEN.value:
-            LOGGER.warning(f"Rejecting unauthorized connection: {self.remote_address[0]}:{self.remote_address[1]}")
-            return HTTPStatus.UNAUTHORIZED, request_headers
+routes = web.RouteTableDef()
 
 
 class Webserver:
@@ -71,23 +53,62 @@ class Webserver:
 
     async def start(self):
         await self.barcode_reader.start()
-        LOGGER.info("Starting webserver...")
-        return await websockets.serve(self.connection_handler, self.host, self.port,
-                                      create_protocol=CustomProtocol)
+        LOGGER.info(f"Starting webserver on {self.config.SERVER_HOST.value}:{self.config.SERVER_PORT.value} ...")
 
-    async def connection_handler(self, websocket, path):
+        app = web.Application(middlewares=[self.authentication_middleware])
+        app.add_routes(routes)
+
+        runner = aiohttp.web.AppRunner(app)
+        await runner.setup()
+        site = aiohttp.web.TCPSite(
+            runner,
+            host=self.config.SERVER_HOST.value,
+            port=self.config.SERVER_PORT.value
+        )
+        await site.start()
+
+        # wait forever
+        return await asyncio.Event().wait()
+
+    @middleware
+    async def authentication_middleware(self, request, handler):
+        if X_Auth_Token not in request.headers.keys() \
+                or request.headers[X_Auth_Token] != self.config.SERVER_API_TOKEN.value:
+            LOGGER.warning(f"Rejecting unauthorized connection: {request.host}")
+            return web.HTTPUnauthorized()
+
+        return await handler(self, request)
+
+    @routes.get("/devices")
+    async def devices_handle(self, request):
+        import orjson
+        device_list = list(map(input_device_to_dict, self.barcode_reader.devices.values()))
+        json = orjson.dumps(device_list)
+        return web.Response(body=json, content_type="application/json")
+
+    @routes.get("/")
+    async def websocket_handler(self, request):
+        websocket = web.WebSocketResponse()
+        await websocket.prepare(request)
+
         self.clients.add(websocket)
-        LOGGER.debug(f"New client connected: {websocket.remote_address} Client count: {len(self.clients)}")
+        LOGGER.debug(f"New client connected: {request.host} Client count: {len(self.clients)}")
         try:
-            while True:
-                request_message = await websocket.recv()
-        except websockets.ConnectionClosedOK:
-            pass
+            async for msg in websocket:
+                if msg.type == aiohttp.WSMsgType.TEXT:
+                    if msg.data.strip() == 'close':
+                        await websocket.close()
+                    else:
+                        await websocket.send_str(msg.data + '/answer')
+                elif msg.type == aiohttp.WSMsgType.ERROR:
+                    LOGGER.debug('ws connection closed with exception %s' %
+                                 websocket.exception())
         except Exception as e:
             LOGGER.exception(e)
         finally:
-            self.clients.remove(websocket)
-            LOGGER.debug(f"Client disconnected: {websocket.remote_address}")
+            self.clients.discard(websocket)
+            LOGGER.debug(f"Client disconnected: {request.host}")
+        return websocket
 
     async def on_barcode(self, device: InputDevice, barcode: str):
         for notifier in self.notifiers:
@@ -95,5 +116,5 @@ class Webserver:
 
         for client in self.clients:
             json = barcode_event_to_json(device, barcode)
-            asyncio.create_task(client.send(json))
+            asyncio.create_task(client.send_str(json))
             LOGGER.debug(f"Notified {client.remote_address}")

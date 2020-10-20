@@ -1,5 +1,5 @@
 barcode_server:
-  log_level: INFO
+  log_level: DEBUG
   server:
     host: "127.0.0.1"
     port: 9654
