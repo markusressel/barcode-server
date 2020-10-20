@@ -15,12 +15,15 @@ class HttpNotifier(BarcodeNotifier):
     def __init__(self, method: str, url: str, headers: List[str]):
         self.method = method
         self.url = url
-        self.headers = headers
+        headers = list(map(lambda x: tuple(x.split(':', 1)), headers))
+        self.headers = list(map(lambda x: (x[0].strip(), x[1].strip()), headers))
 
     async def notify(self, device: InputDevice, barcode: str):
         json = barcode_event_to_json(device, barcode)
-        async with aiohttp.ClientSession() as session:
-            try:
-                await session.request(self.method, self.url, headers=self.headers, data=json)
-            except Exception as e:
-                LOGGER.exception(e)
+        try:
+            async with aiohttp.ClientSession() as session:
+                async with session.request(self.method, self.url, headers=self.headers, data=json) as resp:
+                    resp.raise_for_status()
+                LOGGER.debug(f"Notified {self.url}")
+        except Exception as e:
+            LOGGER.exception(e)

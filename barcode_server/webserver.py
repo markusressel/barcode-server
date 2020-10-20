@@ -82,3 +82,4 @@ class Webserver:
         for client in self.clients:
             json = barcode_event_to_json(device, barcode)
             asyncio.create_task(client.send(json))
+            LOGGER.debug(f"Notified {client.remote_address}")
