@@ -8,13 +8,13 @@ and expose them to other service using a websocket API.
 # Features
 
 * [x] Autodetect Barcode Scanner devices on the fly
-* [x] Request Server information via REST API
+* [x] Request Server information via [REST API](#rest-api)
 * [x] Subscribe to barcode events using
-    * [x] Websocket API
+    * [x] [Websocket API](#websocket-api)
 * [x] Push barcode events using
     * [x] [HTTP requests](#http-request)
     * [x] [MQTT messages](#mqtt-publish)
-* [x] Get statistics via Prometheus exporter
+* [x] Get [statistics](#statistics) via Prometheus exporter
 
 
 # How to use
