@@ -8,7 +8,7 @@ from evdev import *
 
 from barcode_server.config import AppConfig
 from barcode_server.keyevent_reader import KeyEventReader
-from barcode_server.stats import SCAN_COUNT, DEVICES_COUNT
+from barcode_server.stats import SCAN_COUNT, DEVICES_COUNT, DEVICE_DETECTION_TIME
 
 LOGGER = logging.getLogger(__name__)
 
@@ -99,6 +99,7 @@ class BarcodeReader:
         DEVICES_COUNT.set(len(self.devices))
 
     @staticmethod
+    @DEVICE_DETECTION_TIME.time()
     def _find_devices(patterns: List, paths: List[str]) -> Dict[str, InputDevice]:
         """
         # Finds the input device with the name ".*Barcode Reader.*".
