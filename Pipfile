@@ -9,6 +9,7 @@ evdev = "*"
 orjson = ">=3,<4"
 websockets = "*"
 aiohttp = "*"
+asyncio-mqtt = "*"
 prometheus-client = "*"
 
 [dev-packages]

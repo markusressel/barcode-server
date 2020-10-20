@@ -16,6 +16,7 @@ import logging
 import re
 
 from container_app_conf import ConfigBase
+from container_app_conf.entry.bool import BoolConfigEntry
 from container_app_conf.entry.file import FileConfigEntry
 from container_app_conf.entry.int import IntConfigEntry
 from container_app_conf.entry.list import ListConfigEntry
@@ -106,6 +107,80 @@ class AppConfig(ConfigBase):
             "headers"
         ],
         default=[]
+    )
+
+    MQTT_HOST = StringConfigEntry(
+        key_path=[
+            CONFIG_NODE_ROOT,
+            CONFIG_NODE_MQTT,
+            "host"
+        ],
+        required=False
+    )
+    MQTT_PORT = IntConfigEntry(
+        key_path=[
+            CONFIG_NODE_ROOT,
+            CONFIG_NODE_MQTT,
+            "port"
+        ],
+        required=True,
+        default=1883,
+        range=Range(1, 65534),
+    )
+
+    MQTT_CLIENT_ID = StringConfigEntry(
+        key_path=[
+            CONFIG_NODE_ROOT,
+            CONFIG_NODE_MQTT,
+            "client_id"
+        ],
+        default="barcode-server"
+    )
+
+    MQTT_USER = StringConfigEntry(
+        key_path=[
+            CONFIG_NODE_ROOT,
+            CONFIG_NODE_MQTT,
+            "user"
+        ]
+    )
+
+    MQTT_PASSWORD = StringConfigEntry(
+        key_path=[
+            CONFIG_NODE_ROOT,
+            CONFIG_NODE_MQTT,
+            "password"
+        ]
+    )
+
+    MQTT_TOPIC = StringConfigEntry(
+        key_path=[
+            CONFIG_NODE_ROOT,
+            CONFIG_NODE_MQTT,
+            "topic"
+        ],
+        default="barcode-server/barcode",
+        required=True
+    )
+
+    MQTT_QOS = IntConfigEntry(
+        key_path=[
+            CONFIG_NODE_ROOT,
+            CONFIG_NODE_MQTT,
+            "qos"
+        ],
+        default=2,
+        required=True
+    )
+
+    MQTT_RETAIN = BoolConfigEntry(
+        key_path=[
+            CONFIG_NODE_ROOT,
+            CONFIG_NODE_MQTT,
+            "retain"
+        ],
+        default=False,
+        required=True
     )
 
     DEVICE_PATTERNS = ListConfigEntry(

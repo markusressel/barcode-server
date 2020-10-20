@@ -10,6 +10,15 @@ barcode_server:
     method: POST
     headers:
       - "X-Auth-Token: MY_HEADERS"
+  mqtt:
+    host: "mqtt.mydomain.com"
+    port: 1883
+    client_id: "barcode-server"
+    topic: "barcode-server/barcode"
+    user: "myuser"
+    password: "mypassword"
+    qos: 2
+    retain: True
   devices:
     - ".*Barcode.*"
   device_paths:
