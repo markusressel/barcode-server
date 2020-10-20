@@ -1,5 +1,4 @@
 import asyncio
-import atexit
 import logging
 import os
 import signal
@@ -65,7 +64,7 @@ if __name__ == '__main__':
     start_http_server(config.STATS_PORT.value)
 
     tasks = asyncio.gather(
-        webserver.start()
+        webserver.start(),
     )
 
     loop.run_until_complete(tasks)
