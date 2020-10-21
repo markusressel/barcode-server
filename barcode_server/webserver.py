@@ -126,5 +126,8 @@ class Webserver:
     async def _notify_websocket_clients(self, device, barcode):
         for client in self.clients:
             json = barcode_event_to_json(device, barcode)
-            asyncio.create_task(client.send_str(json))
-            LOGGER.debug(f"Notified {client.remote_address}")
+            asyncio.create_task(client.send_bytes(json))
+            # TODO: cant log this here because we don't have access
+            # to an unique identifier anymore, maybe we need to store one manually
+            # when the websocket is connected initially...
+            # LOGGER.debug(f"Notified {client.remote_address}")
