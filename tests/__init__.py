@@ -18,10 +18,10 @@
 #  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 #  SOFTWARE.
 
-import unittest
+from unittest import IsolatedAsyncioTestCase
 
 
-class TestBase(unittest.TestCase):
+class TestBase(IsolatedAsyncioTestCase):
     from barcode_server.config import AppConfig
     from container_app_conf.source.yaml_source import YamlSource
 
