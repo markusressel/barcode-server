@@ -76,7 +76,8 @@ class AppConfig(ConfigBase):
             CONFIG_NODE_SERVER,
             "api_token"
         ],
-        required=True
+        required=True,
+        secret=True
     )
 
     HTTP_METHOD = StringConfigEntry(
@@ -150,7 +151,8 @@ class AppConfig(ConfigBase):
             CONFIG_NODE_ROOT,
             CONFIG_NODE_MQTT,
             "password"
-        ]
+        ],
+        secret=True
     )
 
     MQTT_TOPIC = StringConfigEntry(
