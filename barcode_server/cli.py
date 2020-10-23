@@ -6,7 +6,7 @@ import sys
 
 import click
 from container_app_conf.formatter.toml import TomlFormatter
-from prometheus_async.aio.web import start_http_server
+from prometheus_client import start_http_server
 
 """
 Simple script to read barcodes from a USB connected barcode reader.

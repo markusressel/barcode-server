@@ -55,6 +55,8 @@ even when passing through `/dev/input` like shown above, new devices can not be 
 due to the way docker works. If you need to detect devices in real-time, you have to use
 the native approach.
 
+You can specify the user id and group id using the `PUID` and `PGID` environment variables.
+
 # Webserver
 
 By default the webserver will listen to `127.0.0.1` on port `9654`.
