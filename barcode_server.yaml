@@ -24,4 +24,4 @@ barcode_server:
   device_paths:
   #- "/dev/input/barcode_scanner"
   stats:
-    port: 8000
+    port: 8003
