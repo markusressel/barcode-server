@@ -11,6 +11,7 @@ aiohttp = "*"
 asyncio-mqtt = "*"
 prometheus-client = "*"
 prometheus_async = "*"
+click = "*"
 
 [dev-packages]
 pytest = "*"

@@ -29,22 +29,16 @@ sudo usermod -a -G input myusername
 ## Native
 
 ```
-# clone repo
-git clone https://github.com/markusressel/barcode-server.git
-# enter repo folder
-cd barcode-server
 # create venv
 python -m venv ./venv
 # enter venv
 source ./venv/bin/activate
-# install pipenv
-pip install pipenv
-# use pipenv to install dependencies
-pipenv sync
+# install barcode-server
+pip install barcode-server
 # exit venv
 deactivate
 # launch application
-./venv/bin/python3 ./barcode_server/main.py
+./venv/bin/python3 barcode-server run
 ```
 
 ## Docker
