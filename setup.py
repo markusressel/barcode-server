@@ -66,7 +66,7 @@ setup(
     tests_require=locked_requirements('develop'),
     entry_points={
         'console_scripts': [
-            'barcode-server = barcode_server.main:main'
+            'barcode-server = barcode_server.cli:cli'
         ]
     }
 )
