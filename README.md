@@ -38,7 +38,7 @@ pip install barcode-server
 # exit venv
 deactivate
 # launch application
-./venv/bin/python3 barcode-server run
+./venv/bin/barcode-server run
 ```
 
 ## Docker
