@@ -48,6 +48,8 @@ When starting the docker container, make sure to pass through input devices:
 docker run \
   --name barcode \
   --device=/dev/input \
+  -e PUID=0 \
+  -e PGID=0 \
   markusressel/barcode-server
 ```
 **Note:** Although **barcode-server** will continuously try to detect new devices,
