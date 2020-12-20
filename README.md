@@ -87,6 +87,7 @@ to get realtime barcode scan events.
 Messages received on this websocket are JSON formatted strings with the following format:
 ```json
 {
+  "date": "2020-08-03T10:00:00+00:00",
   "device": {
     "name": "BARCODE SCANNER BARCODE SCANNER",
     "path": "/dev/input/event3",

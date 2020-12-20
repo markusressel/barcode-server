@@ -16,6 +16,7 @@ def barcode_event_to_json(event: BarcodeEvent) -> bytes:
     import orjson
 
     event = {
+        "date": event.date.isoformat(),
         "device": input_device_to_dict(event.input_device),
         "barcode": event.barcode
     }
