@@ -1,19 +1,21 @@
 import asyncio
 import logging
+from typing import List
 
 import aiohttp
 from aiohttp import web
 from aiohttp.web_middlewares import middleware
-from evdev import InputDevice
 from prometheus_async.aio import time
 
-from barcode_server.barcode import BarcodeReader
+from barcode_server.barcode import BarcodeReader, BarcodeEvent
 from barcode_server.config import AppConfig
 from barcode_server.const import *
+from barcode_server.notifier import BarcodeNotifier
 from barcode_server.notifier.http import HttpNotifier
 from barcode_server.notifier.mqtt import MQTTNotifier
-from barcode_server.stats import REST_TIME_DEVICES, WEBSOCKET_CLIENT_COUNT, WEBSOCKET_NOTIFIER_TIME
-from barcode_server.util import barcode_event_to_json, input_device_to_dict
+from barcode_server.notifier.ws import WebsocketNotifier
+from barcode_server.stats import REST_TIME_DEVICES, WEBSOCKET_CLIENT_COUNT
+from barcode_server.util import input_device_to_dict
 
 LOGGER = logging.getLogger(__name__)
 routes = web.RouteTableDef()
@@ -31,8 +33,7 @@ class Webserver:
         self.barcode_reader = barcode_reader
         self.barcode_reader.add_listener(self.on_barcode)
 
-        self.notifiers = [
-        ]
+        self.notifiers: List[BarcodeNotifier] = []
         if config.HTTP_URL.value is not None:
             http_notifier = HttpNotifier(
                 config.HTTP_METHOD.value,
@@ -54,7 +55,11 @@ class Webserver:
             self.notifiers.append(mqtt_notifier)
 
     async def start(self):
+        # start detecting and reading barcode scanners
         await self.barcode_reader.start()
+        # start notifier queue processors
+        for notifier in self.notifiers:
+            await notifier.start()
         LOGGER.info(f"Starting webserver on {self.config.SERVER_HOST.value}:{self.config.SERVER_PORT.value} ...")
 
         app = web.Application(middlewares=[self.authentication_middleware])
@@ -97,6 +102,11 @@ class Webserver:
         self.clients.add(websocket)
         client_count = len(self.clients)
         WEBSOCKET_CLIENT_COUNT.set(client_count)
+
+        notifier = WebsocketNotifier(websocket)
+        await notifier.start()
+        self.notifiers.append(notifier)
+
         LOGGER.debug(f"New client connected: {request.host} Client count: {client_count}")
         try:
             async for msg in websocket:
@@ -111,23 +121,15 @@ class Webserver:
         except Exception as e:
             LOGGER.exception(e)
         finally:
+            self.notifiers.remove(notifier)
+            await notifier.stop()
+
             self.clients.discard(websocket)
             client_count = len(self.clients)
             WEBSOCKET_CLIENT_COUNT.set(client_count)
             LOGGER.debug(f"Client disconnected: {request.host}")
         return websocket
 
-    async def on_barcode(self, device: InputDevice, barcode: str):
+    async def on_barcode(self, event: BarcodeEvent):
         for notifier in self.notifiers:
-            asyncio.create_task(notifier.notify(device, barcode))
-        await self._notify_websocket_clients(device, barcode)
-
-    @time(WEBSOCKET_NOTIFIER_TIME)
-    async def _notify_websocket_clients(self, device, barcode):
-        for client in self.clients:
-            json = barcode_event_to_json(device, barcode)
-            asyncio.create_task(client.send_bytes(json))
-            # TODO: cant log this here because we don't have access
-            # to an unique identifier anymore, maybe we need to store one manually
-            # when the websocket is connected initially...
-            # LOGGER.debug(f"Notified {client.remote_address}")
+            await notifier.add_event(event)
