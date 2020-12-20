@@ -121,6 +121,7 @@ class Webserver:
         except Exception as e:
             LOGGER.exception(e)
         finally:
+            # TODO: this notifier should not be removed immediately, to provide queueing functionality
             self.notifiers.remove(notifier)
             await notifier.stop()
 

@@ -16,8 +16,8 @@ LOGGER = logging.getLogger(__name__)
 
 class BarcodeEvent:
 
-    def __init__(self, input_device: InputDevice, barcode: str, date: datetime = datetime.now()):
-        self.date = date
+    def __init__(self, input_device: InputDevice, barcode: str, date: datetime = None):
+        self.date = date if date is not None else datetime.now()
         self.input_device = input_device
         self.barcode = barcode
 

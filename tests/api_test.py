@@ -17,12 +17,6 @@ class ApiTest(TestBase):
         input_device.info.vendor = 1
         input_device.info.product = 2
 
-        # {
-        #     "name": input_device.name,
-        #     "path": input_device.path,
-        #     "vendorId": f"{input_device.info.vendor: 04x}",
-        #     "productId": f"{input_device.info.product: 04x}",
-        # }
         date = datetime.fromisoformat(str(date_str))
         barcode = "4006824000970"
 
