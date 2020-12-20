@@ -1,5 +1,7 @@
 from evdev import InputDevice
 
+from barcode_server.barcode import BarcodeEvent
+
 
 def input_device_to_dict(input_device: InputDevice) -> dict:
     return {
@@ -10,12 +12,13 @@ def input_device_to_dict(input_device: InputDevice) -> dict:
     }
 
 
-def barcode_event_to_json(input_device: InputDevice, barcode: str) -> bytes:
+def barcode_event_to_json(event: BarcodeEvent) -> bytes:
     import orjson
 
     event = {
-        "device": input_device_to_dict(input_device),
-        "barcode": barcode
+        "date": event.date.isoformat(),
+        "device": input_device_to_dict(event.input_device),
+        "barcode": event.barcode
     }
 
     json = orjson.dumps(event)

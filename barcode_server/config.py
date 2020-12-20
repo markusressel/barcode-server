@@ -22,6 +22,7 @@ from container_app_conf.entry.int import IntConfigEntry
 from container_app_conf.entry.list import ListConfigEntry
 from container_app_conf.entry.regex import RegexConfigEntry
 from container_app_conf.entry.string import StringConfigEntry
+from container_app_conf.entry.timedelta import TimeDeltaConfigEntry
 from container_app_conf.source.env_source import EnvSource
 from container_app_conf.source.toml_source import TomlSource
 from container_app_conf.source.yaml_source import YamlSource
@@ -77,6 +78,22 @@ class AppConfig(ConfigBase):
         ],
         required=True,
         secret=True
+    )
+
+    DROP_EVENT_QUEUE_AFTER = TimeDeltaConfigEntry(
+        key_path=[
+            CONFIG_NODE_ROOT,
+            "drop_event_queue_after"
+        ],
+        default="2h",
+    )
+
+    RETRY_INTERVAL = TimeDeltaConfigEntry(
+        key_path=[
+            CONFIG_NODE_ROOT,
+            "retry_interval"
+        ],
+        default="2s",
     )
 
     HTTP_METHOD = StringConfigEntry(
