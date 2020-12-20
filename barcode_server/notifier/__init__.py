@@ -1,8 +1,10 @@
 import asyncio
 import logging
 from asyncio import Task
+from datetime import datetime
 
 from barcode_server.barcode import BarcodeEvent
+from barcode_server.config import AppConfig
 
 LOGGER = logging.getLogger(__name__)
 
@@ -13,6 +15,9 @@ class BarcodeNotifier:
     """
 
     def __init__(self):
+        config = AppConfig()
+        self.drop_event_queue_after = config.DROP_EVENT_QUEUE_AFTER.value
+        self.retry_interval = config.RETRY_INTERVAL.value
         self.event_queue = asyncio.Queue()
         self.processor_task: Task = None
 
@@ -42,12 +47,16 @@ class BarcodeNotifier:
 
                 success = False
                 while not success:
+                    if datetime.now() - event.date >= self.drop_event_queue_after:
+                        # event is older than threshold, so we just skip it
+                        break
+
                     try:
                         await self._send_event(event)
                         success = True
                     except Exception as ex:
                         LOGGER.exception(ex)
-                        await asyncio.sleep(2)
+                        await asyncio.sleep(self.retry_interval.total_seconds())
 
             except Exception as ex:
                 LOGGER.exception(ex)

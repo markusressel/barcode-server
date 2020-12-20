@@ -1,5 +1,6 @@
 import asyncio
 import logging
+from datetime import datetime
 from pathlib import Path
 from typing import List, Dict
 
@@ -16,6 +17,7 @@ LOGGER = logging.getLogger(__name__)
 class BarcodeEvent:
 
     def __init__(self, input_device: InputDevice, barcode: str):
+        self.date = datetime.now()
         self.input_device = input_device
         self.barcode = barcode
 

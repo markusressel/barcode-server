@@ -5,6 +5,8 @@ barcode_server:
     port: 9654
     ssl: False
     api_token: "EmUSqjXGfnQwn5wn6CpzJRZgoazMTRbMNgH7CXwkQG7Ph7stex"
+  drop_event_queue_after: 2h
+  retry_interval: 2s
   http:
     url: "http://dummy.restapiexample.com/api/v1/create"
     method: POST

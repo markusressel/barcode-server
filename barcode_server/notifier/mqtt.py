@@ -30,12 +30,9 @@ class MQTTNotifier(BarcodeNotifier):
 
     @time(MQTT_NOTIFIER_TIME)
     async def _send_event(self, event: BarcodeEvent):
-        try:
-            json = barcode_event_to_json(event)
-            async with Client(hostname=self.host, port=self.port,
-                              username=self.user, password=self.password,
-                              client_id=self.client_id) as client:
-                await client.publish(self.topic, json, self.qos, self.retain)
-                LOGGER.debug(f"Notified {self.host}:{self.port}: {event.barcode}")
-        except Exception as e:
-            LOGGER.exception(e)
+        json = barcode_event_to_json(event)
+        async with Client(hostname=self.host, port=self.port,
+                          username=self.user, password=self.password,
+                          client_id=self.client_id) as client:
+            await client.publish(self.topic, json, self.qos, self.retain)
+            LOGGER.debug(f"Notified {self.host}:{self.port}: {event.barcode}")
