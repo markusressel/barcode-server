@@ -45,8 +45,6 @@ def signal_handler(signal=None, frame=None):
 
 
 CMD_OPTION_NAMES = {
-    # PARAM_SKIP_ANALYSE_PHASE: ['--skip-analyse-phase', '-sap'],
-    # PARAM_DRY_RUN: ['--dry-run', '-dr']
 }
 
 CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
@@ -68,9 +66,6 @@ def get_option_names(parameter: str) -> list:
 
 
 @cli.command(name="run")
-# @click.option(*get_option_names(PARAM_DRY_RUN), required=False, default=None, is_flag=True,
-#               help='When set no files or folders will actually be deleted but a preview of '
-#                    'what WOULD be done will be printed.')
 def c_run():
     """
     Run the barcode-server
