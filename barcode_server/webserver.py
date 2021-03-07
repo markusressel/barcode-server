@@ -62,9 +62,7 @@ class Webserver:
             await notifier.start()
         LOGGER.info(f"Starting webserver on {self.config.SERVER_HOST.value}:{self.config.SERVER_PORT.value} ...")
 
-        app = web.Application(middlewares=[self.authentication_middleware])
-        app.add_routes(routes)
-
+        app = self.create_app()
         runner = aiohttp.web.AppRunner(app)
         await runner.setup()
         site = aiohttp.web.TCPSite(
@@ -76,6 +74,11 @@ class Webserver:
 
         # wait forever
         return await asyncio.Event().wait()
+
+    def create_app(self) -> web.Application:
+        app = web.Application(middlewares=[self.authentication_middleware])
+        app.add_routes(routes)
+        return app
 
     @middleware
     async def authentication_middleware(self, request, handler):

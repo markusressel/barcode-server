@@ -59,7 +59,8 @@ class AppConfig(ConfigBase):
             CONFIG_NODE_SERVER,
             "host"
         ],
-        default=DEFAULT_SERVER_HOST)
+        default=DEFAULT_SERVER_HOST,
+        secret=True)
 
     SERVER_PORT = IntConfigEntry(
         key_path=[
