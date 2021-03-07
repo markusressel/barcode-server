@@ -1,4 +1,5 @@
 import asyncio
+import random
 from unittest.mock import MagicMock
 
 import aiohttp
@@ -7,6 +8,22 @@ from aiohttp.test_utils import AioHTTPTestCase, unittest_run_loop
 from barcode_server.barcode import BarcodeEvent
 from barcode_server.util import barcode_event_to_json
 from barcode_server.webserver import Webserver
+
+
+def create_barcode_event_mock(barcode: str = None):
+    device = lambda: None
+    device.info = lambda: None
+    device.name = "BARCODE SCANNER BARCODE SCANNER"
+    device.path = "/dev/input/event3"
+    device.info.vendor = 1
+    device.info.product = 1
+
+    event = BarcodeEvent(
+        device,
+        barcode if barcode is not None else f"{random.getrandbits(24)}"
+    )
+
+    return event
 
 
 class WebsocketNotifierTest(AioHTTPTestCase):
@@ -45,20 +62,7 @@ class WebsocketNotifierTest(AioHTTPTestCase):
     # tests that are asynchronous
     @unittest_run_loop
     async def test_ws_connect_and_event(self):
-        sample_barcode = "abcdefg"
-
-        sample_device = lambda: None
-        sample_device.info = lambda: None
-        sample_device.name = "BARCODE SCANNER BARCODE SCANNER"
-        sample_device.path = "/dev/input/event3"
-        sample_device.info.vendor = 1
-        sample_device.info.product = 1
-
-        sample_event = BarcodeEvent(
-            sample_device,
-            sample_barcode
-        )
-
+        sample_event = create_barcode_event_mock("abcdefg")
         expected_json = barcode_event_to_json(sample_event)
 
         async with aiohttp.ClientSession() as session:
