@@ -1,9 +1,9 @@
 import logging
 
 from asyncio_mqtt import Client
-from evdev import InputDevice
 from prometheus_async.aio import time
 
+from barcode_server.barcode import BarcodeEvent
 from barcode_server.notifier import BarcodeNotifier
 from barcode_server.stats import MQTT_NOTIFIER_TIME
 from barcode_server.util import barcode_event_to_json
@@ -18,6 +18,7 @@ class MQTTNotifier(BarcodeNotifier):
                  client_id: str = "barcode-server",
                  user: str = None, password: str = None,
                  qos: int = 2, retain: bool = False):
+        super().__init__()
         self.client_id = client_id
         self.host = host
         self.port = port
@@ -28,13 +29,10 @@ class MQTTNotifier(BarcodeNotifier):
         self.retain = retain
 
     @time(MQTT_NOTIFIER_TIME)
-    async def notify(self, device: InputDevice, barcode: str):
-        json = barcode_event_to_json(device, barcode)
-        try:
-            async with Client(hostname=self.host, port=self.port,
-                              username=self.user, password=self.password,
-                              client_id=self.client_id) as client:
-                await client.publish(self.topic, json, self.qos, self.retain)
-                LOGGER.debug(f"Notified {self.host}:{self.port}: {barcode}")
-        except Exception as e:
-            LOGGER.exception(e)
+    async def _send_event(self, event: BarcodeEvent):
+        json = barcode_event_to_json(event)
+        async with Client(hostname=self.host, port=self.port,
+                          username=self.user, password=self.password,
+                          client_id=self.client_id) as client:
+            await client.publish(self.topic, json, self.qos, self.retain)
+            LOGGER.debug(f"Notified {self.host}:{self.port}: {event.barcode}")

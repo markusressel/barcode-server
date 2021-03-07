@@ -4,6 +4,8 @@ import os
 import signal
 import sys
 
+import click
+from container_app_conf.formatter.toml import TomlFormatter
 from prometheus_client import start_http_server
 
 """
@@ -42,7 +44,32 @@ def signal_handler(signal=None, frame=None):
     os._exit(0)
 
 
-if __name__ == '__main__':
+CMD_OPTION_NAMES = {
+}
+
+CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
+
+
+@click.group(context_settings=CONTEXT_SETTINGS)
+@click.version_option()
+def cli():
+    pass
+
+
+def get_option_names(parameter: str) -> list:
+    """
+    Returns a list of all valid console parameter names for a given parameter
+    :param parameter: the parameter to check
+    :return: a list of all valid names to use this parameter
+    """
+    return CMD_OPTION_NAMES[parameter]
+
+
+@cli.command(name="run")
+def c_run():
+    """
+    Run the barcode-server
+    """
     from barcode_server.barcode import BarcodeReader
     from barcode_server.config import AppConfig
     from barcode_server.webserver import Webserver
@@ -70,3 +97,18 @@ if __name__ == '__main__':
 
     loop.run_until_complete(tasks)
     loop.run_forever()
+
+
+@cli.command(name="config")
+def c_config():
+    """
+    Print the current configuration of barcode-server
+    """
+    from barcode_server.config import AppConfig
+
+    config = AppConfig()
+    click.echo(config.print(TomlFormatter()))
+
+
+if __name__ == '__main__':
+    cli()

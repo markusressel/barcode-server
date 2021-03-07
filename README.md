@@ -1,4 +1,4 @@
-# barcode-server
+# barcode-server [![Code Climate](https://codeclimate.com/github/markusressel/barcode-server.svg)](https://codeclimate.com/github/markusressel/barcode-server)
 
 A simple daemon to read barcodes from USB Barcode Scanners
 and expose them to other service using a websocket API.
@@ -29,22 +29,16 @@ sudo usermod -a -G input myusername
 ## Native
 
 ```
-# clone repo
-git clone https://github.com/markusressel/barcode-server.git
-# enter repo folder
-cd barcode-server
 # create venv
 python -m venv ./venv
 # enter venv
 source ./venv/bin/activate
-# install pipenv
-pip install pipenv
-# use pipenv to install dependencies
-pipenv sync
+# install barcode-server
+pip install barcode-server
 # exit venv
 deactivate
 # launch application
-./venv/bin/python3 ./barcode_server/main.py
+./venv/bin/barcode-server run
 ```
 
 ## Docker
@@ -54,12 +48,16 @@ When starting the docker container, make sure to pass through input devices:
 docker run \
   --name barcode \
   --device=/dev/input \
+  -e PUID=0 \
+  -e PGID=0 \
   markusressel/barcode-server
 ```
 **Note:** Although **barcode-server** will continuously try to detect new devices,
 even when passing through `/dev/input` like shown above, new devices can not be detected
 due to the way docker works. If you need to detect devices in real-time, you have to use
 the native approach.
+
+You can specify the user id and group id using the `PUID` and `PGID` environment variables.
 
 # Webserver
 
@@ -89,6 +87,7 @@ to get realtime barcode scan events.
 Messages received on this websocket are JSON formatted strings with the following format:
 ```json
 {
+  "date": "2020-08-03T10:00:00+00:00",
   "device": {
     "name": "BARCODE SCANNER BARCODE SCANNER",
     "path": "/dev/input/event3",
@@ -102,9 +101,9 @@ Messages received on this websocket are JSON formatted strings with the followin
 To test the connection you can use f.ex. `websocat`:
 
 ```
-> websocat ws://127.0.0.1:9654 --header "X-Auth-Token:EmUSqjXGfnQwn5wn6CpzJRZgoazMTRbMNgH7CXwkQG7Ph7stex"
-{"device":{"name":"BARCODE SCANNER BARCODE SCANNER","path":"/dev/input/event3","vendorId":65535,"productId":53},"barcode":"D-t38409355843o52230Lm54784"}
-{"device":{"name":"BARCODE SCANNER BARCODE SCANNER","path":"/dev/input/event3","vendorId":65535,"productId":53},"barcode":"4250168519463"}
+> websocat - autoreconnect:ws://127.0.0.1:9654 --text --header "X-Auth-Token:EmUSqjXGfnQwn5wn6CpzJRZgoazMTRbMNgH7CXwkQG7Ph7stex"
+{"date":"2020-12-20T19:35:04.769739","device":{"name":"BARCODE SCANNER BARCODE SCANNER","path":"/dev/input/event3","vendorId":65535,"productId":53},"barcode":"D-t38409355843o52230Lm54784"}
+{"date":"2020-12-20T19:35:06.237408","device":{"name":"BARCODE SCANNER BARCODE SCANNER","path":"/dev/input/event3","vendorId":65535,"productId":53},"barcode":"4250168519463"}
 ```
 
 ## HTTP Request

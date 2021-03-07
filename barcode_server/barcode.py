@@ -1,5 +1,6 @@
 import asyncio
 import logging
+from datetime import datetime
 from pathlib import Path
 from typing import List, Dict
 
@@ -13,9 +14,17 @@ from barcode_server.stats import SCAN_COUNT, DEVICES_COUNT, DEVICE_DETECTION_TIM
 LOGGER = logging.getLogger(__name__)
 
 
+class BarcodeEvent:
+
+    def __init__(self, input_device: InputDevice, barcode: str, date: datetime = None):
+        self.date = date if date is not None else datetime.now()
+        self.input_device = input_device
+        self.barcode = barcode
+
+
 class BarcodeReader:
     """
-    Reads barcodes from a USB barcode scanner
+    Reads barcodes from all USB barcode scanners in the system
     """
 
     def __init__(self, config: AppConfig):
@@ -53,7 +62,8 @@ class BarcodeReader:
         """
         while True:
             try:
-                self._detect_devices()
+                self.devices = self._find_devices(self.config.DEVICE_PATTERNS.value, self.config.DEVICE_PATHS.value)
+                DEVICES_COUNT.set(len(self.devices))
 
                 for path, d in self.devices.items():
                     if path in self._device_tasks:
@@ -80,7 +90,8 @@ class BarcodeReader:
             while True:
                 barcode = await self._read_line(input_device)
                 if barcode is not None and len(barcode) > 0:
-                    asyncio.create_task(self._notify_listeners(input_device, barcode))
+                    event = BarcodeEvent(input_device, barcode)
+                    asyncio.create_task(self._notify_listeners(event))
         except Exception as e:
             LOGGER.exception(e)
             self._device_tasks.pop(input_device.path)
@@ -90,13 +101,6 @@ class BarcodeReader:
                 input_device.ungrab()
             except Exception as e:
                 pass
-
-    def _detect_devices(self):
-        """
-        Detects barcode USB devices
-        """
-        self.devices = self._find_devices(self.config.DEVICE_PATTERNS.value, self.config.DEVICE_PATHS.value)
-        DEVICES_COUNT.set(len(self.devices))
 
     @staticmethod
     @DEVICE_DETECTION_TIME.time()
@@ -152,13 +156,12 @@ class BarcodeReader:
         """
         self.listeners.add(listener)
 
-    async def _notify_listeners(self, input_device: InputDevice, barcode: str):
+    async def _notify_listeners(self, event: BarcodeEvent):
         """
         Notifies all listeners about the scanned barcode
-        :param input_device: device that scanned the barcode
-        :param barcode: the barcode
+        :param event: barcode event
         """
         SCAN_COUNT.inc()
-        LOGGER.info(f"{input_device.name} ({input_device.path}): {barcode}")
+        LOGGER.info(f"{event.input_device.name} ({event.input_device.path}): {event.barcode}")
         for listener in self.listeners:
-            asyncio.create_task(listener(input_device, barcode))
+            asyncio.create_task(listener(event))
