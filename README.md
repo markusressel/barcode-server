@@ -37,6 +37,10 @@ source ./venv/bin/activate
 pip install barcode-server
 # exit venv
 deactivate
+
+# print config
+./venv/bin/barcode-server config
+
 # launch application
 ./venv/bin/barcode-server run
 ```
