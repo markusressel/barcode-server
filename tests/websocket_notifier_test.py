@@ -65,10 +65,16 @@ class WebsocketNotifierTest(AioHTTPTestCase):
         sample_event = create_barcode_event_mock("abcdefg")
         expected_json = barcode_event_to_json(sample_event)
 
+        import uuid
+        client_id = str(uuid.uuid4())
+
         async with aiohttp.ClientSession() as session:
             async with session.ws_connect(
                     'http://127.0.0.1:9654/',
-                    headers={"X-Auth-Token": self.config.SERVER_API_TOKEN.value}) as ws:
+                    headers={
+                        "Client-ID": client_id,
+                        "X-Auth-Token": self.config.SERVER_API_TOKEN.value
+                    }) as ws:
                 asyncio.create_task(self.webserver.on_barcode(sample_event))
                 async for msg in ws:
                     if msg.type == aiohttp.WSMsgType.BINARY:

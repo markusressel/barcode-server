@@ -13,6 +13,8 @@
 #  You should have received a copy of the GNU Affero General Public License
 #  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+Client_Id = "Client-ID"
+Drop_Event_Queue = "Drop-Event-Queue"
 X_Auth_Token = "X-Auth-Token"
 
 CONFIG_NODE_ROOT = "barcode_server"

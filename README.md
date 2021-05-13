@@ -88,6 +88,11 @@ the approaches described below.
 In addition to the REST API **barcode-server** also exposes a websocket at `/`, which can be used
 to get realtime barcode scan events.
 
+To connect to it, you have to provide
+
+* a `Client-ID` header with a UUID (v4)
+* (optional) an empty `Drop-Event-Queue` header, to ignore events that happened between connections
+
 Messages received on this websocket are JSON formatted strings with the following format:
 ```json
 {
@@ -105,7 +110,7 @@ Messages received on this websocket are JSON formatted strings with the followin
 To test the connection you can use f.ex. `websocat`:
 
 ```
-> websocat - autoreconnect:ws://127.0.0.1:9654 --text --header "X-Auth-Token:EmUSqjXGfnQwn5wn6CpzJRZgoazMTRbMNgH7CXwkQG7Ph7stex"
+> websocat - autoreconnect:ws://127.0.0.1:9654 --text --header "Client-ID:dc1f14fc-a7a6-4102-af60-2b6e0dcf744c" --header "Drop-Event-Queue" --header "X-Auth-Token:EmUSqjXGfnQwn5wn6CpzJRZgoazMTRbMNgH7CXwkQG7Ph7stex"
 {"date":"2020-12-20T19:35:04.769739","device":{"name":"BARCODE SCANNER BARCODE SCANNER","path":"/dev/input/event3","vendorId":65535,"productId":53},"barcode":"D-t38409355843o52230Lm54784"}
 {"date":"2020-12-20T19:35:06.237408","device":{"name":"BARCODE SCANNER BARCODE SCANNER","path":"/dev/input/event3","vendorId":65535,"productId":53},"barcode":"4250168519463"}
 ```
