@@ -137,7 +137,10 @@ class Webserver:
         else:
             LOGGER.debug(
                 f"Previously seen client reconnected: {client_id} (from {request.host})")
+
         notifier = self.notifiers[client_id]
+        if isinstance(notifier, WebsocketNotifier):
+            notifier.websocket = websocket
 
         if Drop_Event_Queue in request.headers.keys():
             await notifier.drop_queue()

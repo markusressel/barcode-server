@@ -88,3 +88,47 @@ class WebsocketNotifierTest(AioHTTPTestCase):
                         assert False
 
         assert False
+
+    @unittest_run_loop
+    async def test_ws_reconnect_event_catchup(self):
+        sample_event = create_barcode_event_mock("abcdefg")
+        expected_json = barcode_event_to_json(sample_event)
+
+        import uuid
+        client_id = str(uuid.uuid4())
+
+        # connect to the server once
+        async with aiohttp.ClientSession() as session:
+            async with session.ws_connect(
+                    'http://127.0.0.1:9654/',
+                    headers={
+                        "Client-ID": client_id,
+                        "X-Auth-Token": self.config.SERVER_API_TOKEN.value
+                    }) as ws:
+                await ws.close()
+
+        # then emulate a barcode scan event
+        asyncio.create_task(self.webserver.on_barcode(sample_event))
+
+        await asyncio.sleep(1)
+
+        # and then reconnect again, expecting the event in between
+        async with aiohttp.ClientSession() as session:
+            async with session.ws_connect(
+                    'http://127.0.0.1:9654/',
+                    headers={
+                        "Client-ID": client_id,
+                        "X-Auth-Token": self.config.SERVER_API_TOKEN.value
+                    }) as ws:
+                async for msg in ws:
+                    if msg.type == aiohttp.WSMsgType.BINARY:
+                        if expected_json == msg.data:
+                            await ws.close()
+                            assert True
+                            return
+                        else:
+                            assert False
+                    else:
+                        assert False
+
+        assert False
