@@ -91,8 +91,10 @@ class WebsocketNotifierTest(AioHTTPTestCase):
 
     @unittest_run_loop
     async def test_ws_reconnect_event_catchup(self):
-        sample_event = create_barcode_event_mock("abcdefg")
-        expected_json = barcode_event_to_json(sample_event)
+        missed_event = create_barcode_event_mock("abcdefg")
+        second_event = create_barcode_event_mock("123456")
+        missed_event_json = barcode_event_to_json(missed_event)
+        second_event_json = barcode_event_to_json(second_event)
 
         import uuid
         client_id = str(uuid.uuid4())
@@ -108,9 +110,9 @@ class WebsocketNotifierTest(AioHTTPTestCase):
                 await ws.close()
 
         # then emulate a barcode scan event
-        asyncio.create_task(self.webserver.on_barcode(sample_event))
+        asyncio.create_task(self.webserver.on_barcode(missed_event))
 
-        await asyncio.sleep(1)
+        await asyncio.sleep(0.1)
 
         # and then reconnect again, expecting the event in between
         async with aiohttp.ClientSession() as session:
@@ -120,9 +122,19 @@ class WebsocketNotifierTest(AioHTTPTestCase):
                         "Client-ID": client_id,
                         "X-Auth-Token": self.config.SERVER_API_TOKEN.value
                     }) as ws:
+                # emulate another event, while connected
+                asyncio.create_task(self.webserver.on_barcode(second_event))
+
+                missed_event_received = False
                 async for msg in ws:
                     if msg.type == aiohttp.WSMsgType.BINARY:
-                        if expected_json == msg.data:
+                        if missed_event_json == msg.data:
+                            if missed_event_received:
+                                assert False
+                            missed_event_received = True
+                        elif second_event_json == msg.data:
+                            if not missed_event_received:
+                                assert False
                             await ws.close()
                             assert True
                             return
