@@ -5,6 +5,7 @@ from unittest.mock import MagicMock
 import aiohttp
 from aiohttp.test_utils import AioHTTPTestCase, unittest_run_loop
 
+from barcode_server import const
 from barcode_server.barcode import BarcodeEvent
 from barcode_server.util import barcode_event_to_json
 from barcode_server.webserver import Webserver
@@ -72,8 +73,8 @@ class WebsocketNotifierTest(AioHTTPTestCase):
             async with session.ws_connect(
                     'http://127.0.0.1:9654/',
                     headers={
-                        "Client-ID": client_id,
-                        "X-Auth-Token": self.config.SERVER_API_TOKEN.value
+                        const.Client_Id: client_id,
+                        const.X_Auth_Token: self.config.SERVER_API_TOKEN.value
                     }) as ws:
                 asyncio.create_task(self.webserver.on_barcode(sample_event))
                 async for msg in ws:
@@ -104,8 +105,8 @@ class WebsocketNotifierTest(AioHTTPTestCase):
             async with session.ws_connect(
                     'http://127.0.0.1:9654/',
                     headers={
-                        "Client-ID": client_id,
-                        "X-Auth-Token": self.config.SERVER_API_TOKEN.value
+                        const.Client_Id: client_id,
+                        const.X_Auth_Token: self.config.SERVER_API_TOKEN.value
                     }) as ws:
                 await ws.close()
 
@@ -119,8 +120,8 @@ class WebsocketNotifierTest(AioHTTPTestCase):
             async with session.ws_connect(
                     'http://127.0.0.1:9654/',
                     headers={
-                        "Client-ID": client_id,
-                        "X-Auth-Token": self.config.SERVER_API_TOKEN.value
+                        const.Client_Id: client_id,
+                        const.X_Auth_Token: self.config.SERVER_API_TOKEN.value
                     }) as ws:
                 # emulate another event, while connected
                 asyncio.create_task(self.webserver.on_barcode(second_event))
@@ -135,6 +136,59 @@ class WebsocketNotifierTest(AioHTTPTestCase):
                         elif second_event_json == msg.data:
                             if not missed_event_received:
                                 assert False
+                            await ws.close()
+                            assert True
+                            return
+                        else:
+                            assert False
+                    else:
+                        assert False
+
+        assert False
+
+    @unittest_run_loop
+    async def test_ws_reconnect_drop_cache(self):
+        missed_event = create_barcode_event_mock("abcdefg")
+        second_event = create_barcode_event_mock("123456")
+        missed_event_json = barcode_event_to_json(missed_event)
+        second_event_json = barcode_event_to_json(second_event)
+
+        import uuid
+        client_id = str(uuid.uuid4())
+
+        # connect to the server once
+        async with aiohttp.ClientSession() as session:
+            async with session.ws_connect(
+                    'http://127.0.0.1:9654/',
+                    headers={
+                        const.Client_Id: client_id,
+                        const.X_Auth_Token: self.config.SERVER_API_TOKEN.value
+                    }) as ws:
+                await ws.close()
+
+        # then emulate a barcode scan event while not connected
+        asyncio.create_task(self.webserver.on_barcode(missed_event))
+
+        await asyncio.sleep(0.1)
+
+        # and then reconnect again, passing the "drop cache" header, expecting only
+        # the new live event
+        async with aiohttp.ClientSession() as session:
+            async with session.ws_connect(
+                    'http://127.0.0.1:9654/',
+                    headers={
+                        const.Client_Id: client_id,
+                        const.Drop_Event_Queue: "",
+                        const.X_Auth_Token: self.config.SERVER_API_TOKEN.value
+                    }) as ws:
+                # emulate another event, while connected
+                asyncio.create_task(self.webserver.on_barcode(second_event))
+
+                async for msg in ws:
+                    if msg.type == aiohttp.WSMsgType.BINARY:
+                        if missed_event_json == msg.data:
+                            assert False
+                        elif second_event_json == msg.data:
                             await ws.close()
                             assert True
                             return
