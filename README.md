@@ -26,6 +26,20 @@ input devices (usually `input`), like this:
 ```
 sudo usermod -a -G input myusername
 ```
+
+## Configuration
+
+**barcode-server** uses [container-app-conf](https://github.com/markusressel/container-app-conf)
+to provide configuration via a YAML or TOML file as well as ENV variables. Have a look at the
+[documentation about it](https://github.com/markusressel/container-app-conf).
+
+The config file is searched for in the following locations (in this order):
+* `./`
+* `~/.config/`
+* `~/`
+
+See [barcode_server.yaml](/barcode_server.yaml) for an example in this repo.
+
 ## Native
 
 ```
@@ -52,6 +66,7 @@ When starting the docker container, make sure to pass through input devices:
 docker run \
   --name barcode \
   --device=/dev/input \
+  -v ./barcode_server.yaml:/app/barcode_server.yaml \
   -e PUID=0 \
   -e PGID=0 \
   markusressel/barcode-server
