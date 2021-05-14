@@ -74,6 +74,7 @@ class BarcodeNotifier:
                 while not success:
                     if datetime.now() - event.date >= self.drop_event_queue_after:
                         # event is older than threshold, so we just skip it
+                        self.event_queue.task_done()
                         break
 
                     try:
