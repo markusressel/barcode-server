@@ -1,4 +1,4 @@
-PROJECT = "n26"
+PROJECT=barcode_server
 
 current-version:
 	@echo "Current version is `cat ${PROJECT}/__init__.py | grep '__version__' | cut -d ' ' -f3 | sed s/\'//g`"
