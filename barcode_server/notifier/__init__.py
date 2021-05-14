@@ -1,7 +1,8 @@
 import asyncio
 import logging
-from asyncio import Task
+from asyncio import Task, QueueEmpty
 from datetime import datetime
+from typing import Optional
 
 from barcode_server.barcode import BarcodeEvent
 from barcode_server.config import AppConfig
@@ -19,7 +20,10 @@ class BarcodeNotifier:
         self.drop_event_queue_after = config.DROP_EVENT_QUEUE_AFTER.value
         self.retry_interval = config.RETRY_INTERVAL.value
         self.event_queue = asyncio.Queue()
-        self.processor_task: Task = None
+        self.processor_task: Optional[Task] = None
+
+    def is_running(self) -> bool:
+        return self.processor_task is not None
 
     async def start(self):
         """
@@ -37,6 +41,27 @@ class BarcodeNotifier:
         self.processor_task.cancel()
         self.processor_task = None
 
+    async def drop_queue(self):
+        """
+        Drops all items in the event queue
+        """
+        running = self.is_running()
+        # stop if currently running
+        if running:
+            await self.stop()
+
+        # mark all items as finished
+        for _ in range(self.event_queue.qsize()):
+            try:
+                self.event_queue.get_nowait()
+                self.event_queue.task_done()
+            except QueueEmpty as ex:
+                break
+
+        # restart if it was running
+        if running:
+            await self.start()
+
     async def event_processor(self):
         """
         Processes the event queue
@@ -49,11 +74,13 @@ class BarcodeNotifier:
                 while not success:
                     if datetime.now() - event.date >= self.drop_event_queue_after:
                         # event is older than threshold, so we just skip it
+                        self.event_queue.task_done()
                         break
 
                     try:
                         await self._send_event(event)
                         success = True
+                        self.event_queue.task_done()
                     except Exception as ex:
                         LOGGER.exception(ex)
                         await asyncio.sleep(self.retry_interval.total_seconds())
@@ -73,3 +100,4 @@ class BarcodeNotifier:
         :param event: barcode event
         """
         raise NotImplementedError()
+

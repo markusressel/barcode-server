@@ -4,6 +4,11 @@ from barcode_server.barcode import BarcodeEvent
 
 
 def input_device_to_dict(input_device: InputDevice) -> dict:
+    """
+    Converts an input device to a a dictionary with human readable values
+    :param input_device: the device to convert
+    :return: dictionary
+    """
     return {
         "name": input_device.name,
         "path": input_device.path,
@@ -13,6 +18,11 @@ def input_device_to_dict(input_device: InputDevice) -> dict:
 
 
 def barcode_event_to_json(event: BarcodeEvent) -> bytes:
+    """
+    Converts a barcode event to json
+    :param event: the event to convert
+    :return: json representation
+    """
     import orjson
 
     event = {

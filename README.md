@@ -26,6 +26,20 @@ input devices (usually `input`), like this:
 ```
 sudo usermod -a -G input myusername
 ```
+
+## Configuration
+
+**barcode-server** uses [container-app-conf](https://github.com/markusressel/container-app-conf)
+to provide configuration via a YAML or TOML file as well as ENV variables. Have a look at the
+[documentation about it](https://github.com/markusressel/container-app-conf).
+
+The config file is searched for in the following locations (in this order):
+* `./`
+* `~/.config/`
+* `~/`
+
+See [barcode_server.yaml](/barcode_server.yaml) for an example in this repo.
+
 ## Native
 
 ```
@@ -52,6 +66,7 @@ When starting the docker container, make sure to pass through input devices:
 docker run \
   --name barcode \
   --device=/dev/input \
+  -v ./barcode_server.yaml:/app/barcode_server.yaml \
   -e PUID=0 \
   -e PGID=0 \
   markusressel/barcode-server
@@ -88,6 +103,12 @@ the approaches described below.
 In addition to the REST API **barcode-server** also exposes a websocket at `/`, which can be used
 to get realtime barcode scan events.
 
+To connect to it, you have to provide
+
+* a `Client-ID` header with a UUID (v4)
+* (optional) an empty `Drop-Event-Queue` header, to ignore events that happened between connections
+* (optional) an `X-Auth-Token` header, to authorize the client
+
 Messages received on this websocket are JSON formatted strings with the following format:
 ```json
 {
@@ -105,7 +126,7 @@ Messages received on this websocket are JSON formatted strings with the followin
 To test the connection you can use f.ex. `websocat`:
 
 ```
-> websocat - autoreconnect:ws://127.0.0.1:9654 --text --header "X-Auth-Token:EmUSqjXGfnQwn5wn6CpzJRZgoazMTRbMNgH7CXwkQG7Ph7stex"
+> websocat - autoreconnect:ws://127.0.0.1:9654 --text --header "Client-ID:dc1f14fc-a7a6-4102-af60-2b6e0dcf744c" --header "Drop-Event-Queue:" --header "X-Auth-Token:EmUSqjXGfnQwn5wn6CpzJRZgoazMTRbMNgH7CXwkQG7Ph7stex"
 {"date":"2020-12-20T19:35:04.769739","device":{"name":"BARCODE SCANNER BARCODE SCANNER","path":"/dev/input/event3","vendorId":65535,"productId":53},"barcode":"D-t38409355843o52230Lm54784"}
 {"date":"2020-12-20T19:35:06.237408","device":{"name":"BARCODE SCANNER BARCODE SCANNER","path":"/dev/input/event3","vendorId":65535,"productId":53},"barcode":"4250168519463"}
 ```
