@@ -77,7 +77,7 @@ class AppConfig(ConfigBase):
             CONFIG_NODE_SERVER,
             "api_token"
         ],
-        required=True,
+        default=None,
         secret=True
     )
 
