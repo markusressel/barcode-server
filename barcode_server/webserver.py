@@ -83,8 +83,9 @@ class Webserver:
 
     @middleware
     async def authentication_middleware(self, request, handler):
-        if X_Auth_Token not in request.headers.keys() \
-                or request.headers[X_Auth_Token] != self.config.SERVER_API_TOKEN.value:
+        if self.config.SERVER_API_TOKEN.value is not None and \
+                (X_Auth_Token not in request.headers.keys()
+                 or request.headers[X_Auth_Token] != self.config.SERVER_API_TOKEN.value):
             LOGGER.warning(f"Rejecting unauthorized connection: {request.host}")
             return web.HTTPUnauthorized()
 
