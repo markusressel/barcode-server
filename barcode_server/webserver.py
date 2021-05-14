@@ -15,7 +15,7 @@ from barcode_server.notifier.http import HttpNotifier
 from barcode_server.notifier.mqtt import MQTTNotifier
 from barcode_server.notifier.ws import WebsocketNotifier
 from barcode_server.stats import REST_TIME_DEVICES, WEBSOCKET_CLIENT_COUNT
-from barcode_server.util import input_device_to_dict, is_valid_uuid
+from barcode_server.util import input_device_to_dict
 
 LOGGER = logging.getLogger(__name__)
 routes = web.RouteTableDef()
@@ -93,11 +93,6 @@ class Webserver:
             return web.HTTPBadRequest()
 
         client_id = request.headers[Client_Id].lower().strip()
-
-        if not is_valid_uuid(client_id):
-            LOGGER.warning(
-                f"Rejecting client with invalid UUID '{request.headers[Client_Id]}': {request.host}")
-            return web.HTTPBadRequest()
 
         if self.clients.get(client_id, None) is not None:
             LOGGER.warning(

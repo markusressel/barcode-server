@@ -33,26 +33,3 @@ def barcode_event_to_json(event: BarcodeEvent) -> bytes:
 
     json = orjson.dumps(event)
     return json
-
-
-def is_valid_uuid(uuid_str: str):
-    """
-    Validates if the given string is a valid UUID version 4
-
-    :param uuid_str: the string to validate
-    :return: true if valid, false otherwise
-    """
-    try:
-        import uuid
-        val = uuid.UUID(uuid_str, version=4)
-    except ValueError:
-        # If it's a value error, then the string
-        # is not a valid hex code for a UUID.
-        return False
-
-    # If the uuid_string is a valid hex code,
-    # but an invalid uuid4,
-    # the UUID.__init__ will convert it to a
-    # valid uuid4. So we compare them again to
-    # make sure they are still the same.
-    return str(val) == uuid_str
