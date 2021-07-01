@@ -11,6 +11,7 @@ daysUntilClose: 14
 exemptLabels:
   - bug
   - feature
+  - enhancement
   - pinned
   - security
 
