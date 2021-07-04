@@ -7,12 +7,12 @@ on:
 jobs:
   buildx:
     runs-on: ubuntu-latest
-      #strategy:
-      #fail-fast: false
-      #max-parallel: 1
-      #matrix:
-      # Not all for time waste reasons
-    #platform: [ "linux/arm64", "linux/amd64" ]
+    strategy:
+      fail-fast: false
+      max-parallel: 2
+      matrix:
+        # Not all for time waste reasons
+        platform: [ "linux/arm64", "linux/amd64" ]
     steps:
       - name: Checkout
         uses: actions/checkout@v2
@@ -74,6 +74,3 @@ jobs:
       - name: Build
         run: |
           docker buildx build --output "type=image,push=true" ${{ steps.prepare.outputs.buildx_args }}
-
-      #--platform linux/386,linux/amd64,linux/arm/v6,linux/arm/v7,linux/arm64,linux/ppc64le,linux/s390x \
-      #--tag ${{ steps.prepare.outputs.docker_image }}:multiarch-${{ steps.prepare.outputs.version }}
