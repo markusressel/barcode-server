@@ -66,7 +66,7 @@ When starting the docker container, make sure to pass through input devices:
 docker run \
   --name barcode \
   --device=/dev/input \
-  -v ./barcode_server.yaml:/app/barcode_server.yaml \
+  -v "/home/markus/.config/barcode_server.yaml:/app/barcode_server.yaml" \
   -e PUID=0 \
   -e PGID=0 \
   markusressel/barcode-server
