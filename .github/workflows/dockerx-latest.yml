@@ -2,7 +2,10 @@ name: Docker Image latest
 
 on:
   push:
-  #branches: [ master ]
+    branches:
+      - master
+    tags:
+      - "*.*.*"
 
 jobs:
   buildx:
@@ -16,6 +19,10 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v2
+
+      # this writes the tag name into GIT_TAG_NAME
+      - name: Get tag name
+        uses: little-core-labs/get-git-tag@v3.0.1
 
       # https://github.com/docker/setup-qemu-action
       - name: Set up QEMU
@@ -44,13 +51,10 @@ jobs:
           DOCKER_PLATFORMS=linux/amd64,linux/arm64
 
           VERSION=latest
-          if [[ $GITHUB_REF == refs/tags/* ]]; then
-            VERSION=${GITHUB_REF#refs/tags/v}
-          fi
-
           TAGS="--tag ${DOCKER_IMAGE}:${VERSION}"
-          if [[ $VERSION =~ ^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$ ]]; then
-            TAGS="$TAGS --tag ${DOCKER_IMAGE}:latest"
+          if [[ $GIT_TAG_NAME =~ ^v?[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$ ]]; then
+            VERSION=${GIT_TAG_NAME}
+            TAGS="$TAGS --tag ${DOCKER_IMAGE}:${VERSION}"
           fi
 
           echo ::set-output name=docker_image::${DOCKER_IMAGE}
