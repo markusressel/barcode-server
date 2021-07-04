@@ -39,8 +39,9 @@ jobs:
         id: prepare
         run: |
           DOCKER_IMAGE=markusressel/barcode-server
-          # taken from: https://hub.docker.com/_/python
-          DOCKER_PLATFORMS=linux/amd64,linux/arm/v6,linux/arm/v7,linux/arm64
+          # compare with support in base image: https://hub.docker.com/_/python
+          # orjson only supports 64bit variants, see: https://github.com/ijl/orjson
+          DOCKER_PLATFORMS=linux/amd64,linux/arm64
 
           VERSION=multiarch-latest
           if [[ $GITHUB_REF == refs/tags/* ]]; then
