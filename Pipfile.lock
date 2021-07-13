@@ -69,11 +69,11 @@
         },
         "asyncio-mqtt": {
             "hashes": [
-                "sha256:0550229cecde6ff1751c49dd5ea26b02bf52b7e9bbe9bf763da765f35bb281de",
-                "sha256:a6a885a0856781a646a8a75f1a43657ab4092bfff7d53c878dad7cd224d5d9e6"
+                "sha256:46bf3549ed254c0939f0aa2b378adba87928e66be680a53044c85812f4065278",
+                "sha256:5f5f7abb9dbf11caefa7f63b0ca7270c02d39233b5c4792ff35fb900df6e2469"
             ],
             "index": "pypi",
-            "version": "==0.9.1"
+            "version": "==0.10.0"
         },
         "attrs": {
             "hashes": [
