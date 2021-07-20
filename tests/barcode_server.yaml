@@ -2,9 +2,8 @@ barcode_server:
   server:
     host: "127.0.0.1"
     port: 9654
-    ssl: False
     api_token: "EmUSqjXGfnQwn5wn6CpzJRZgoazMTRbMNgH7CXwkQG7Ph7stex"
   devices:
     - "Barcode/i"
   stats:
-    port: 8000
+    port:
