@@ -167,7 +167,7 @@ Have a look at the [example config](barcode_server.yaml) for more options.
 ## Statistics
 
 **barcode-server** exposes a prometheus exporter (defaults to port `8000`) to give some statistical insight.
-A brief overview of the available statistics:
+A brief overview of (most) available metrics:
 
 | Name | Type | Description |
 |------|------|-------------|
