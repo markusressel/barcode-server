@@ -66,8 +66,6 @@ def c_run():
     barcode_reader = BarcodeReader(config)
     webserver = Webserver(config, barcode_reader)
 
-    LOGGER.info("Starting...")
-
     # start prometheus server
     if config.STATS_PORT.value is not None:
         LOGGER.info("Starting statistics webserver...")
