@@ -17,9 +17,10 @@ def input_device_to_dict(input_device: InputDevice) -> dict:
     }
 
 
-def barcode_event_to_json(event: BarcodeEvent) -> bytes:
+def barcode_event_to_json(server_id: str, event: BarcodeEvent) -> bytes:
     """
     Converts a barcode event to json
+    :param server_id: server instance id
     :param event: the event to convert
     :return: json representation
     """
@@ -27,6 +28,7 @@ def barcode_event_to_json(event: BarcodeEvent) -> bytes:
 
     event = {
         "id": event.id,
+        "serverId": server_id,
         "date": event.date.isoformat(),
         "device": input_device_to_dict(event.input_device),
         "barcode": event.barcode

@@ -20,10 +20,12 @@ class ApiTest(TestBase):
         date = datetime.fromisoformat(str(date_str))
         barcode = "4006824000970"
 
+        server_id = "server-id"
         event = BarcodeEvent(input_device, barcode, date)
-        event_json = str(barcode_event_to_json(event))
+        event_json = str(barcode_event_to_json(server_id, event))
 
         self.assertIn(event.id, event_json)
+        self.assertIn(server_id, event_json)
         self.assertIn(date_str, event_json)
         self.assertIn(input_device.path, event_json)
         self.assertIn(barcode, event_json)

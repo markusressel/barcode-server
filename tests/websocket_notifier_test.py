@@ -64,7 +64,8 @@ class WebsocketNotifierTest(AioHTTPTestCase):
     @unittest_run_loop
     async def test_ws_connect_and_event(self):
         sample_event = create_barcode_event_mock("abcdefg")
-        expected_json = barcode_event_to_json(sample_event)
+        server_id = "server-id"
+        expected_json = barcode_event_to_json(server_id, sample_event)
 
         import uuid
         client_id = str(uuid.uuid4())
@@ -92,10 +93,11 @@ class WebsocketNotifierTest(AioHTTPTestCase):
 
     @unittest_run_loop
     async def test_ws_reconnect_event_catchup(self):
+        server_id = "server-id"
         missed_event = create_barcode_event_mock("abcdefg")
         second_event = create_barcode_event_mock("123456")
-        missed_event_json = barcode_event_to_json(missed_event)
-        second_event_json = barcode_event_to_json(second_event)
+        missed_event_json = barcode_event_to_json(server_id, missed_event)
+        second_event_json = barcode_event_to_json(server_id, second_event)
 
         import uuid
         client_id = str(uuid.uuid4())
@@ -148,10 +150,11 @@ class WebsocketNotifierTest(AioHTTPTestCase):
 
     @unittest_run_loop
     async def test_ws_reconnect_drop_cache(self):
+        server_id = "server-id"
         missed_event = create_barcode_event_mock("abcdefg")
         second_event = create_barcode_event_mock("123456")
-        missed_event_json = barcode_event_to_json(missed_event)
-        second_event_json = barcode_event_to_json(second_event)
+        missed_event_json = barcode_event_to_json(server_id, missed_event)
+        second_event_json = barcode_event_to_json(server_id, second_event)
 
         import uuid
         client_id = str(uuid.uuid4())

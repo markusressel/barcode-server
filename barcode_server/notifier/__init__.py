@@ -16,9 +16,9 @@ class BarcodeNotifier:
     """
 
     def __init__(self):
-        config = AppConfig()
-        self.drop_event_queue_after = config.DROP_EVENT_QUEUE_AFTER.value
-        self.retry_interval = config.RETRY_INTERVAL.value
+        self.config = AppConfig()
+        self.drop_event_queue_after = self.config.DROP_EVENT_QUEUE_AFTER.value
+        self.retry_interval = self.config.RETRY_INTERVAL.value
         self.event_queue = asyncio.Queue()
         self.processor_task: Optional[Task] = None
 
