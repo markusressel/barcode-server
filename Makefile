@@ -1,7 +1,8 @@
 PROJECT=barcode_server
 
 current-version:
-	@echo "Current version is `cat ${PROJECT}/__init__.py | grep '__version__' | cut -d ' ' -f3 | sed s/\'//g`"
+    set -ex
+	@echo "Current version is `cat ${PROJECT}/__init__.py | grep '__version__' | cut -d ' ' -f3 | sed s/\\\"//g`"
 
 build:
 	git stash
@@ -18,9 +19,10 @@ upload:
 	python setup.py sdist upload -r pypi
 
 git-release:
+    set -ex
 	git add ${PROJECT}/__init__.py
-	git commit -m "Bumped version to `cat ${PROJECT}/__init__.py | grep '__version__' | cut -d ' ' -f3 | sed s/\'//g`"
-	git tag `cat ${PROJECT}/__init__.py | grep '__version__' | cut -d ' ' -f3 | sed s/\'//g`
+	git commit -m "Bumped version to `cat ${PROJECT}/__init__.py | grep '__version__' | cut -d ' ' -f3 | sed s/\\\"//g`"
+	git tag `cat ${PROJECT}/__init__.py | grep '__version__' | cut -d ' ' -f3 | sed s/\"//g`
 	git push
 	git push --tags
 
