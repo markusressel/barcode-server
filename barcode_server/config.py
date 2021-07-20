@@ -80,7 +80,7 @@ class AppConfig(ConfigBase):
             CONFIG_NODE_PORT
         ],
         range=Range(1, 65534),
-        default=9465)
+        default=DEFAULT_SERVER_PORT)
 
     SERVER_API_TOKEN = StringConfigEntry(
         key_path=[
