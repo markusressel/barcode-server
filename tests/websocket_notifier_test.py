@@ -75,7 +75,7 @@ class WebsocketNotifierTest(AioHTTPTestCase):
                     'http://127.0.0.1:9654/',
                     headers={
                         const.Client_Id: client_id,
-                        const.X_Auth_Token: self.config.SERVER_API_TOKEN.value
+                        const.X_Auth_Token: self.config.SERVER_API_TOKEN.value or ""
                     }) as ws:
                 asyncio.create_task(self.webserver.on_barcode(sample_event))
                 async for msg in ws:
@@ -105,7 +105,7 @@ class WebsocketNotifierTest(AioHTTPTestCase):
                     'http://127.0.0.1:9654/',
                     headers={
                         const.Client_Id: client_id,
-                        const.X_Auth_Token: self.config.SERVER_API_TOKEN.value
+                        const.X_Auth_Token: self.config.SERVER_API_TOKEN.value or ""
                     }) as ws:
                 await ws.close()
 
@@ -120,7 +120,7 @@ class WebsocketNotifierTest(AioHTTPTestCase):
                     'http://127.0.0.1:9654/',
                     headers={
                         const.Client_Id: client_id,
-                        const.X_Auth_Token: self.config.SERVER_API_TOKEN.value
+                        const.X_Auth_Token: self.config.SERVER_API_TOKEN.value or ""
                     }) as ws:
                 # emulate another event, while connected
                 asyncio.create_task(self.webserver.on_barcode(second_event))
@@ -161,7 +161,7 @@ class WebsocketNotifierTest(AioHTTPTestCase):
                     'http://127.0.0.1:9654/',
                     headers={
                         const.Client_Id: client_id,
-                        const.X_Auth_Token: self.config.SERVER_API_TOKEN.value
+                        const.X_Auth_Token: self.config.SERVER_API_TOKEN.value or ""
                     }) as ws:
                 await ws.close()
 
@@ -178,7 +178,7 @@ class WebsocketNotifierTest(AioHTTPTestCase):
                     headers={
                         const.Client_Id: client_id,
                         const.Drop_Event_Queue: "",
-                        const.X_Auth_Token: self.config.SERVER_API_TOKEN.value
+                        const.X_Auth_Token: self.config.SERVER_API_TOKEN.value or ""
                     }) as ws:
                 # emulate another event, while connected
                 asyncio.create_task(self.webserver.on_barcode(second_event))
