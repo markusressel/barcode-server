@@ -14,6 +14,7 @@
 #  along with this program.  If not, see <https://www.gnu.org/licenses/>.
 import logging
 import re
+import uuid
 
 from container_app_conf import ConfigBase
 from container_app_conf.entry.bool import BoolConfigEntry
@@ -51,6 +52,16 @@ class AppConfig(ConfigBase):
         ],
         regex=re.compile(f" {'|'.join(logging._nameToLevel.keys())}", flags=re.IGNORECASE),
         default="INFO",
+    )
+
+    INSTANCE_ID = StringConfigEntry(
+        key_path=[
+            CONFIG_NODE_ROOT,
+            "id"
+        ],
+        regex=re.compile("[0-9a-zA-Z\.\_\-\+\/\#]+"),
+        default=str(uuid.uuid4()),
+        required=True
     )
 
     SERVER_HOST = StringConfigEntry(

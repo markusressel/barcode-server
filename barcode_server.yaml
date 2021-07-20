@@ -3,6 +3,10 @@ barcode_server:
   # (optional) the verbosity level of log output
   log_level: DEBUG
 
+  # (optional) an identifier for this barcode-server instance
+  # if omitted, this will be a UUIDv4
+  id: cash-register-1
+
   # (optional) server configuration
   server:
     # (optional) the IP address to listen on for incoming connections
