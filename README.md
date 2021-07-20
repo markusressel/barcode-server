@@ -167,6 +167,16 @@ Have a look at the [example config](barcode_server.yaml) for more options.
 ## Statistics
 
 **barcode-server** exposes a prometheus exporter (defaults to port `8000`) to give some statistical insight.
+A brief overview of the available statistics:
+
+| Name | Type | Description |
+|------|------|-------------|
+| websocket_client_count | Gauge | Number of currently connected websocket clients |
+| devices_count | Gauge | Number of currently detected devices |
+| scan_count | Gauge | Number of times a scan has been detected |
+| device_detection_processing_seconds | Summary | Time spent detecting devices |
+| rest_endpoint_processing_seconds | Summary | Time spent in a rest command handler |
+| notifier_processing_seconds | Summary | Time spent in a notifier |
 
 # FAQ
 
