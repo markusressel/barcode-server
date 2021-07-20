@@ -23,6 +23,7 @@ class ApiTest(TestBase):
         event = BarcodeEvent(input_device, barcode, date)
         event_json = str(barcode_event_to_json(event))
 
+        self.assertIn(event.id, event_json)
         self.assertIn(date_str, event_json)
         self.assertIn(input_device.path, event_json)
         self.assertIn(barcode, event_json)
