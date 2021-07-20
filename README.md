@@ -113,6 +113,7 @@ Messages received on this websocket are JSON formatted strings with the followin
 ```json
 {
   "id": "33cb5677-3d0b-4faf-9dc4-d19a8ee7d8a1",
+  "serverId": "cash-register-1",
   "date": "2020-08-03T10:00:00+00:00",
   "device": {
     "name": "BARCODE SCANNER BARCODE SCANNER",
