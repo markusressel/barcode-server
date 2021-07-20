@@ -1,4 +1,4 @@
-name: Docker Image latest
+name: Docker Image
 
 on:
   push:
