@@ -112,6 +112,8 @@ To connect to it, you have to provide
 Messages received on this websocket are JSON formatted strings with the following format:
 ```json
 {
+  "id": "33cb5677-3d0b-4faf-9dc4-d19a8ee7d8a1",
+  "serverId": "cash-register-1",
   "date": "2020-08-03T10:00:00+00:00",
   "device": {
     "name": "BARCODE SCANNER BARCODE SCANNER",
@@ -165,6 +167,16 @@ Have a look at the [example config](barcode_server.yaml) for more options.
 ## Statistics
 
 **barcode-server** exposes a prometheus exporter (defaults to port `8000`) to give some statistical insight.
+A brief overview of (most) available metrics:
+
+| Name | Type | Description |
+|------|------|-------------|
+| websocket_client_count | Gauge | Number of currently connected websocket clients |
+| devices_count | Gauge | Number of currently detected devices |
+| scan_count | Gauge | Number of times a scan has been detected |
+| device_detection_processing_seconds | Summary | Time spent detecting devices |
+| rest_endpoint_processing_seconds | Summary | Time spent in a rest command handler |
+| notifier_processing_seconds | Summary | Time spent in a notifier |
 
 # FAQ
 

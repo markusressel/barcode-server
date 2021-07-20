@@ -30,7 +30,7 @@ class MQTTNotifier(BarcodeNotifier):
 
     @time(MQTT_NOTIFIER_TIME)
     async def _send_event(self, event: BarcodeEvent):
-        json = barcode_event_to_json(event)
+        json = barcode_event_to_json(self.config.INSTANCE_ID.value, event)
         async with Client(hostname=self.host, port=self.port,
                           username=self.user, password=self.password,
                           client_id=self.client_id) as client:

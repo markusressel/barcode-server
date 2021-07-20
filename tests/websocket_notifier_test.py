@@ -64,7 +64,8 @@ class WebsocketNotifierTest(AioHTTPTestCase):
     @unittest_run_loop
     async def test_ws_connect_and_event(self):
         sample_event = create_barcode_event_mock("abcdefg")
-        expected_json = barcode_event_to_json(sample_event)
+        server_id = self.config.INSTANCE_ID.value
+        expected_json = barcode_event_to_json(server_id, sample_event)
 
         import uuid
         client_id = str(uuid.uuid4())
@@ -74,28 +75,26 @@ class WebsocketNotifierTest(AioHTTPTestCase):
                     'http://127.0.0.1:9654/',
                     headers={
                         const.Client_Id: client_id,
-                        const.X_Auth_Token: self.config.SERVER_API_TOKEN.value
+                        const.X_Auth_Token: self.config.SERVER_API_TOKEN.value or ""
                     }) as ws:
                 asyncio.create_task(self.webserver.on_barcode(sample_event))
                 async for msg in ws:
                     if msg.type == aiohttp.WSMsgType.BINARY:
-                        if expected_json == msg.data:
-                            await ws.close()
-                            assert True
-                            return
-                        else:
-                            assert False
+                        self.assertEqual(expected_json, msg.data)
+                        await ws.close()
+                        return
                     else:
-                        assert False
+                        self.fail("No event received")
 
         assert False
 
     @unittest_run_loop
     async def test_ws_reconnect_event_catchup(self):
+        server_id = self.config.INSTANCE_ID.value
         missed_event = create_barcode_event_mock("abcdefg")
         second_event = create_barcode_event_mock("123456")
-        missed_event_json = barcode_event_to_json(missed_event)
-        second_event_json = barcode_event_to_json(second_event)
+        missed_event_json = barcode_event_to_json(server_id, missed_event)
+        second_event_json = barcode_event_to_json(server_id, second_event)
 
         import uuid
         client_id = str(uuid.uuid4())
@@ -106,7 +105,7 @@ class WebsocketNotifierTest(AioHTTPTestCase):
                     'http://127.0.0.1:9654/',
                     headers={
                         const.Client_Id: client_id,
-                        const.X_Auth_Token: self.config.SERVER_API_TOKEN.value
+                        const.X_Auth_Token: self.config.SERVER_API_TOKEN.value or ""
                     }) as ws:
                 await ws.close()
 
@@ -121,7 +120,7 @@ class WebsocketNotifierTest(AioHTTPTestCase):
                     'http://127.0.0.1:9654/',
                     headers={
                         const.Client_Id: client_id,
-                        const.X_Auth_Token: self.config.SERVER_API_TOKEN.value
+                        const.X_Auth_Token: self.config.SERVER_API_TOKEN.value or ""
                     }) as ws:
                 # emulate another event, while connected
                 asyncio.create_task(self.webserver.on_barcode(second_event))
@@ -137,21 +136,21 @@ class WebsocketNotifierTest(AioHTTPTestCase):
                             if not missed_event_received:
                                 assert False
                             await ws.close()
-                            assert True
                             return
                         else:
                             assert False
                     else:
-                        assert False
+                        self.fail("No event received")
 
         assert False
 
     @unittest_run_loop
-    async def test_ws_reconnect_drop_cache(self):
+    async def test_ws_reconnect_drop_queue(self):
+        server_id = self.config.INSTANCE_ID.value
         missed_event = create_barcode_event_mock("abcdefg")
         second_event = create_barcode_event_mock("123456")
-        missed_event_json = barcode_event_to_json(missed_event)
-        second_event_json = barcode_event_to_json(second_event)
+        missed_event_json = barcode_event_to_json(server_id, missed_event)
+        second_event_json = barcode_event_to_json(server_id, second_event)
 
         import uuid
         client_id = str(uuid.uuid4())
@@ -162,7 +161,7 @@ class WebsocketNotifierTest(AioHTTPTestCase):
                     'http://127.0.0.1:9654/',
                     headers={
                         const.Client_Id: client_id,
-                        const.X_Auth_Token: self.config.SERVER_API_TOKEN.value
+                        const.X_Auth_Token: self.config.SERVER_API_TOKEN.value or ""
                     }) as ws:
                 await ws.close()
 
@@ -179,7 +178,7 @@ class WebsocketNotifierTest(AioHTTPTestCase):
                     headers={
                         const.Client_Id: client_id,
                         const.Drop_Event_Queue: "",
-                        const.X_Auth_Token: self.config.SERVER_API_TOKEN.value
+                        const.X_Auth_Token: self.config.SERVER_API_TOKEN.value or ""
                     }) as ws:
                 # emulate another event, while connected
                 asyncio.create_task(self.webserver.on_barcode(second_event))
@@ -187,14 +186,14 @@ class WebsocketNotifierTest(AioHTTPTestCase):
                 async for msg in ws:
                     if msg.type == aiohttp.WSMsgType.BINARY:
                         if missed_event_json == msg.data:
-                            assert False
+                            self.fail("Received missed event despite queue drop")
                         elif second_event_json == msg.data:
                             await ws.close()
                             assert True
                             return
                         else:
-                            assert False
+                            self.fail("Received unexpected event")
                     else:
-                        assert False
+                        self.fail("No event received")
 
         assert False

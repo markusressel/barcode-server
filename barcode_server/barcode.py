@@ -1,5 +1,6 @@
 import asyncio
 import logging
+import uuid
 from datetime import datetime
 from pathlib import Path
 from typing import List, Dict
@@ -17,8 +18,10 @@ LOGGER = logging.getLogger(__name__)
 class BarcodeEvent:
 
     def __init__(self, input_device: InputDevice, barcode: str, date: datetime = None):
+        self.id = str(uuid.uuid4())
         self.date = date if date is not None else datetime.now()
-        self.input_device = input_device
+        self.device = input_device
+        self.input_device = self.device
         self.barcode = barcode
 
 

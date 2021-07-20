@@ -23,7 +23,7 @@ class HttpNotifier(BarcodeNotifier):
 
     @time(HTTP_NOTIFIER_TIME)
     async def _send_event(self, event: BarcodeEvent):
-        json = barcode_event_to_json(event)
+        json = barcode_event_to_json(self.config.INSTANCE_ID.value, event)
         async with aiohttp.ClientSession() as session:
             async with session.request(self.method, self.url, headers=self.headers, data=json) as resp:
                 resp.raise_for_status()

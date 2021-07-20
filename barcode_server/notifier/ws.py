@@ -14,7 +14,7 @@ class WebsocketNotifier(BarcodeNotifier):
 
     @time(WEBSOCKET_NOTIFIER_TIME)
     async def _send_event(self, event: BarcodeEvent):
-        json = barcode_event_to_json(event)
+        json = barcode_event_to_json(self.config.INSTANCE_ID.value, event)
         await self.websocket.send_bytes(json)
 
         # TODO: cant log websocket address here because we don't have access
