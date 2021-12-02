@@ -30,12 +30,13 @@ class KeyEventReader:
         # async for event in input_device.async_read_loop():
         for event in input_device.read_loop():
             event = categorize(event)
-            if isinstance(event, KeyEvent):
+            if isinstance(event, KeyEvent) or event.event.type == 1:
+                if not hasattr(event, "keystate"):
+                    event.keystate = event.event.keystate
                 if self._on_key_event(event):
                     return self._line
 
     def _on_key_event(self, event: KeyEvent) -> bool:
-        LOGGER.debug(str(event))
         # if event.type == evdev.ecodes.EV_KEY and event.value == 1:
         if event.keycode == "KEY_ENTER" or event.keycode == "KEY_KPENTER":
             if event.keystate == event.key_up:
