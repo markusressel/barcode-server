@@ -62,16 +62,16 @@ class KeyEventReader:
 
     def _on_key_event(self, event: KeyEvent) -> bool:
         # if event.type == evdev.ecodes.EV_KEY and event.value == 1:
-        if event.keycode == "KEY_ENTER" or event.keycode == "KEY_KPENTER":
+        if event.keycode in ["KEY_ENTER", "KEY_KPENTER"]:
             if event.keystate == event.key_up:
                 # line is finished
                 return True
-        elif event.keycode == "KEY_RIGHTSHIFT" or event.keycode == "KEY_LEFTSHIFT":
+        elif event.keycode in ["KEY_RIGHTSHIFT", "KEY_LEFTSHIFT"]:
             if event.keystate in [event.key_down, event.key_hold]:
                 self._shift = True
             else:
                 self._shift = False
-        elif event.keycode == "KEY_LEFTALT" or event.keycode == "KEY_RIGHTALT":
+        elif event.keycode in ["KEY_LEFTALT", "KEY_RIGHTALT"]:
             if event.keystate in [event.key_down, event.key_hold]:
                 self._alt = True
             else:
@@ -83,11 +83,11 @@ class KeyEventReader:
 
             if len(event.keycode) == 5:
                 character = event.keycode[-1]
-            elif event.keycode == "KEY_MINUS":
-                character = '-'
+            elif event.keycode.startswith("KEY_KP") and len(event.keycode) == 7:
+                character = event.keycode[-1]
+
             elif event.keycode == "KEY_SPACE":
                 character = ' '
-
             elif event.keycode in ["KEY_ASTERISK", "KEY_KPASTERISK"]:
                 character = '*'
             elif event.keycode in ["KEY_MINUS", "KEY_KPMINUS"]:
@@ -96,7 +96,6 @@ class KeyEventReader:
                 character = '+'
             elif event.keycode == "KEY_QUESTION":
                 character = '?'
-
             elif event.keycode in ["KEY_COMMA", "KEY_KPCOMMA"]:
                 character = ','
             elif event.keycode in ["KEY_DOT", "KEY_KPDOT"]:
@@ -107,15 +106,12 @@ class KeyEventReader:
                 character = '('
             elif event.keycode in ["KEY_PLUSMINUS", "KEY_KPPLUSMINUS"]:
                 character = '+-'
-            elif event.keycode == "KEY_RIGHTPAREN":
+            elif event.keycode in ["KEY_RIGHTPAREN", "KEY_KPRIGHTPAREN"]:
                 character = ')'
-            elif event.keycode == "KEY_SLASH":
+            elif event.keycode in ["KEY_SLASH", "KEY_KPSLASH"]:
                 character = '/'
             elif event.keycode == "KEY_SEMICOLON":
                 character = ':'
-            elif event.keycode.startswith("KEY_KP"):
-                if len(event.keycode) == 7:
-                    character = event.keycode[-1]
 
             if character is None:
                 character = event.keycode[4:]

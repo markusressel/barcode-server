@@ -115,7 +115,7 @@ class KeyEventReaderTest(TestBase):
     async def test_special_characters(self):
         # GIVEN
         under_test = KeyEventReader()
-        expected = ".,*/+-?"
+        expected = "+.,*/-?"
         input_events = self.generate_input_event_sequence(expected)
         input_device = Mock()
         input_device.read_loop = self.fake_input_loop(input_events)
