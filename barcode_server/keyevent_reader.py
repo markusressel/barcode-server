@@ -4,6 +4,30 @@ from evdev import KeyEvent, InputDevice, categorize
 
 LOGGER = logging.getLogger(__name__)
 
+US_EN_UPPER_DICT = {
+    "`": "~",
+    "1": "!",
+    "2": "@",
+    "3": "#",
+    "4": "$",
+    "5": "%",
+    "6": "^",
+    "7": "&",
+    "8": "*",
+    "9": "(",
+    "0": ")",
+    "-": "_",
+    "=": "+",
+    ",": "<",
+    ".": ">",
+    "/": "?",
+    ";": ":",
+    "'": "\"",
+    "\\": "|",
+    "[": "{",
+    "]": "{"
+}
+
 
 class KeyEventReader:
     """
@@ -63,31 +87,35 @@ class KeyEventReader:
                 character = '-'
             elif event.keycode == "KEY_SPACE":
                 character = ' '
+
+            elif event.keycode in ["KEY_ASTERISK", "KEY_KPASTERISK"]:
+                character = '*'
+            elif event.keycode in ["KEY_MINUS", "KEY_KPMINUS"]:
+                character = '-'
+            elif event.keycode in ["KEY_PLUS", "KEY_KPPLUS"]:
+                character = '+'
+            elif event.keycode == "KEY_QUESTION":
+                character = '?'
+
+            elif event.keycode in ["KEY_COMMA", "KEY_KPCOMMA"]:
+                character = ','
+            elif event.keycode in ["KEY_DOT", "KEY_KPDOT"]:
+                character = '.'
+            elif event.keycode in ["KEY_EQUAL", "KEY_KPEQUAL"]:
+                character = '='
+            elif event.keycode == "KEY_LEFTPAREN":
+                character = '('
+            elif event.keycode in ["KEY_PLUSMINUS", "KEY_KPPLUSMINUS"]:
+                character = '+-'
+            elif event.keycode == "KEY_RIGHTPAREN":
+                character = ')'
+            elif event.keycode == "KEY_SLASH":
+                character = '/'
+            elif event.keycode == "KEY_SEMICOLON":
+                character = ':'
             elif event.keycode.startswith("KEY_KP"):
                 if len(event.keycode) == 7:
                     character = event.keycode[-1]
-                elif event.keycode == "KEY_KPASTERISK":
-                    character = '*'
-                elif event.keycode == "KEY_KPCOMMA":
-                    character = ','
-                elif event.keycode == "KEY_KPDOT":
-                    character = '.'
-                elif event.keycode == "KEY_KPEQUAL":
-                    character = '='
-                elif event.keycode == "KEY_KPJPCOMMA":
-                    character = ','
-                elif event.keycode == "KEY_KPLEFTPAREN":
-                    character = '('
-                elif event.keycode == "KEY_KPMINUS":
-                    character = '-'
-                elif event.keycode == "KEY_KPPLUS":
-                    character = '+'
-                elif event.keycode == "KEY_KPPLUSMINUS":
-                    character = '+-'
-                elif event.keycode == "KEY_KPRIGHTPAREN":
-                    character = ')'
-                elif event.keycode == "KEY_KPSLASH":
-                    character = '/'
 
             if character is None:
                 character = event.keycode[4:]
@@ -96,6 +124,8 @@ class KeyEventReader:
 
             if self._shift or self._caps:
                 character = character.upper()
+                if character in US_EN_UPPER_DICT.keys():
+                    character = US_EN_UPPER_DICT[character]
             else:
                 character = character.lower()
 

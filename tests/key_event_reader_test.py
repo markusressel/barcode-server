@@ -3,7 +3,6 @@ from unittest.mock import Mock
 
 from evdev import InputEvent, ecodes, KeyEvent
 
-import barcode_server.keyevent_reader
 from barcode_server.keyevent_reader import KeyEventReader
 from tests import TestBase
 
@@ -31,60 +30,6 @@ class KeyEventReaderTest(TestBase):
         input_event.code = code
 
         return input_event
-
-    @staticmethod
-    def mock_key_event(keycode) -> KeyEvent:
-        event = Mock()
-        event.type = -1
-        event.keystate = 0  # UP
-        event.keycode = keycode
-        # inverse lookup of the event code in the target structure
-        code = next(key for key, value in ecodes.keys.items() if value == keycode)
-        event.code = code
-
-        event.__str__ = Mock(return_value='MOCK')
-        return event
-
-    def test_mock_gen(self):
-        # GIVEN
-        expected = [
-            self.mock_input_event(keycode="KEY_MINUS", keystate=KeyEvent.key_down),
-            self.mock_input_event(keycode="KEY_MINUS", keystate=KeyEvent.key_up),
-
-            self.mock_input_event(keycode="KEY_DOT", keystate=KeyEvent.key_down),
-            self.mock_input_event(keycode="KEY_DOT", keystate=KeyEvent.key_up),
-
-            self.mock_input_event(keycode="KEY_MINUS", keystate=KeyEvent.key_down),
-            self.mock_input_event(keycode="KEY_MINUS", keystate=KeyEvent.key_up),
-
-            self.mock_input_event(keycode="KEY_ENTER", keystate=KeyEvent.key_down),
-            self.mock_input_event(keycode="KEY_ENTER", keystate=KeyEvent.key_up),
-        ]
-        text = "-.-"
-
-        # WHEN
-        input_events = self.generate_input_event_sequence(text)
-
-        # THEN
-        self.assertEqual(len(expected), len(input_events))
-        for i in range(0, len(expected)):
-            self.assertEqual(expected[i].keycode, input_events[i].keycode)
-
-    async def test_numbers(self):
-        barcode_server.keyevent_reader.LOGGER.disabled = True
-
-        # GIVEN
-        under_test = KeyEventReader()
-        expected = "0123456789"
-        input_events = self.generate_input_event_sequence(expected)
-        input_device = Mock()
-        input_device.read_loop = self.fake_input_loop(input_events)
-
-        # WHEN
-        line = under_test.read_line(input_device)
-
-        # THEN
-        self.assertEqual(expected, line)
 
     def generate_input_event_sequence(self, expected: str, finish_line: bool = True) -> List[InputEvent]:
         events = []
@@ -116,8 +61,67 @@ class KeyEventReaderTest(TestBase):
             '8': "KEY_KP8",
             '9': "KEY_KP9",
 
-            '-': "KEY_MINUS",
+            '*': "KEY_KPASTERISK",
+            '/': "KEY_SLASH",
+            '-': "KEY_KPMINUS",
+            '+': "KEY_KPPLUS",
             '.': "KEY_DOT",
+            ',': "KEY_COMMA",
+            '?': "KEY_QUESTION",
+
             '\n': "KEY_ENTER",
         }
         return char_to_keycode_map[character]
+
+    def test_mock_gen(self):
+        # GIVEN
+        expected = [
+            self.mock_input_event(keycode="KEY_KPMINUS", keystate=KeyEvent.key_down),
+            self.mock_input_event(keycode="KEY_KPMINUS", keystate=KeyEvent.key_up),
+
+            self.mock_input_event(keycode="KEY_DOT", keystate=KeyEvent.key_down),
+            self.mock_input_event(keycode="KEY_DOT", keystate=KeyEvent.key_up),
+
+            self.mock_input_event(keycode="KEY_KPMINUS", keystate=KeyEvent.key_down),
+            self.mock_input_event(keycode="KEY_KPMINUS", keystate=KeyEvent.key_up),
+
+            self.mock_input_event(keycode="KEY_ENTER", keystate=KeyEvent.key_down),
+            self.mock_input_event(keycode="KEY_ENTER", keystate=KeyEvent.key_up),
+        ]
+        text = "-.-"
+
+        # WHEN
+        input_events = self.generate_input_event_sequence(text)
+
+        # THEN
+        self.assertEqual(len(expected), len(input_events))
+        for i in range(0, len(expected)):
+            self.assertEqual(expected[i].keycode, input_events[i].keycode)
+
+    async def test_numbers(self):
+        # GIVEN
+        under_test = KeyEventReader()
+        expected = "0123456789"
+        input_events = self.generate_input_event_sequence(expected)
+        input_device = Mock()
+        input_device.read_loop = self.fake_input_loop(input_events)
+
+        # WHEN
+        line = under_test.read_line(input_device)
+
+        # THEN
+        self.assertEqual(expected, line)
+
+    async def test_special_characters(self):
+        # GIVEN
+        under_test = KeyEventReader()
+        expected = ".,*/+-?"
+        input_events = self.generate_input_event_sequence(expected)
+        input_device = Mock()
+        input_device.read_loop = self.fake_input_loop(input_events)
+
+        # WHEN
+        line = under_test.read_line(input_device)
+
+        # THEN
+        self.assertEqual(expected, line)
