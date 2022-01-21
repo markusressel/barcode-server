@@ -890,11 +890,19 @@
         },
         "pytest-aiohttp": {
             "hashes": [
-                "sha256:0b9b660b146a65e1313e2083d0d2e1f63047797354af9a28d6b7c9f0726fa33d",
-                "sha256:c929854339637977375838703b62fef63528598bc0a9d451639eba95f4aaa44f"
+                "sha256:56239a3e0abc393d9037995b2aa04a024c5e172e17046f2ef831a293fa13ace9",
+                "sha256:c53e93f030a46d55b40dd601170da9afd66d2e4f36fc5a4b3b3787011e7b0c93"
             ],
             "index": "pypi",
-            "version": "==0.3.0"
+            "version": "==1.0.1"
+        },
+        "pytest-asyncio": {
+            "hashes": [
+                "sha256:6d895b02432c028e6957d25fc936494e78c6305736e785d9fee408b1efbc7ff4",
+                "sha256:e0fe5dbea40516b661ef1bcfe0bd9461c2847c4ef4bb40012324f2454fb7d56d"
+            ],
+            "markers": "python_version >= '3.7'",
+            "version": "==0.17.2"
         },
         "pytest-mock": {
             "hashes": [
