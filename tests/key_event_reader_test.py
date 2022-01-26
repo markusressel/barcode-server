@@ -125,3 +125,20 @@ class KeyEventReaderTest(TestBase):
 
         # THEN
         self.assertEqual(expected, line)
+
+    async def test_event_without_event_attribute(self):
+        # GIVEN
+        under_test = KeyEventReader()
+        expected = "0"
+        input_events = self.generate_input_event_sequence(expected)
+        for event in input_events:
+            delattr(event, "event")
+
+        input_device = Mock()
+        input_device.read_loop = self.fake_input_loop(input_events)
+
+        # WHEN
+        line = under_test.read_line(input_device)
+
+        # THEN
+        self.assertEqual(expected, line)
