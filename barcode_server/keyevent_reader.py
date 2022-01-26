@@ -54,7 +54,11 @@ class KeyEventReader:
         # async for event in input_device.async_read_loop():
         for event in input_device.read_loop():
             event = categorize(event)
-            if isinstance(event, KeyEvent) or event.event.type == 1:
+
+            if isinstance(event, KeyEvent):
+                if self._on_key_event(event):
+                    return self._line
+            elif hasattr(event, "event") and event.event.type == 1:
                 if not hasattr(event, "keystate"):
                     event.keystate = event.event.keystate
                 if self._on_key_event(event):
