@@ -108,7 +108,9 @@ class KeyEventReader:
         elif code.startswith("KEY_KP") and len(code) == 7:
             character = code[-1]
 
-        elif code == "KEY_SPACE":
+        elif code in ["KEY_DOWN"]:
+            character = '\n'
+        elif code in ["KEY_SPACE"]:
             character = ' '
         elif code in ["KEY_ASTERISK", "KEY_KPASTERISK"]:
             character = '*'
@@ -116,7 +118,7 @@ class KeyEventReader:
             character = '-'
         elif code in ["KEY_PLUS", "KEY_KPPLUS"]:
             character = '+'
-        elif code == "KEY_QUESTION":
+        elif code in ["KEY_QUESTION"]:
             character = '?'
         elif code in ["KEY_COMMA", "KEY_KPCOMMA"]:
             character = ','
@@ -124,16 +126,28 @@ class KeyEventReader:
             character = '.'
         elif code in ["KEY_EQUAL", "KEY_KPEQUAL"]:
             character = '='
-        elif code == "KEY_LEFTPAREN":
+        elif code in ["KEY_LEFTPAREN", "KEY_KPLEFTPAREN"]:
             character = '('
         elif code in ["KEY_PLUSMINUS", "KEY_KPPLUSMINUS"]:
             character = '+-'
         elif code in ["KEY_RIGHTPAREN", "KEY_KPRIGHTPAREN"]:
             character = ')'
+        elif code in ["KEY_RIGHTBRACE"]:
+            character = ']'
+        elif code in ["KEY_LEFTBRACE"]:
+            character = '['
         elif code in ["KEY_SLASH", "KEY_KPSLASH"]:
             character = '/'
-        elif code == "KEY_SEMICOLON":
-            character = ':'
+        elif code in ["KEY_BACKSLASH"]:
+            character = '\\'
+        elif code in ["KEY_COLON"]:
+            character = ';'
+        elif code in ["KEY_SEMICOLON"]:
+            character = ';'
+        elif code in ["KEY_APOSTROPHE"]:
+            character = '\''
+        elif code in ["KEY_GRAVE"]:
+            character = '`'
 
         if character is None:
             character = code[4:]
