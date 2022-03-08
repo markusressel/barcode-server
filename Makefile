@@ -16,8 +16,9 @@ git-release:
 	set -ex
 	git add ${PROJECT}/__init__.py
 	git commit -m "Bumped version to `cat ${PROJECT}/__init__.py | grep '__version__' | cut -d ' ' -f3 | sed s/\\\"//g`"
-	git tag `cat ${PROJECT}/__init__.py | grep '__version__' | cut -d ' ' -f3 | sed s/\"//g`
-
+	git tag v`cat ${PROJECT}/__init__.py | grep '__version__' | cut -d ' ' -f3 | sed s/\"//g`
+	git push
+    git push --tags
 
 _release-patch:
 	@echo "__version__ = \"`cat ${PROJECT}/__init__.py | awk -F '("|")' '{ print($$2)}' | awk -F. '{$$NF = $$NF + 1;} 1' | sed 's/ /./g'`\"" > ${PROJECT}/__init__.py
