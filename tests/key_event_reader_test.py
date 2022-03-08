@@ -21,7 +21,7 @@ class KeyEventReaderTest(TestBase):
 
     @staticmethod
     def mock_input_event(keycode, keystate) -> InputEvent:
-        input_event = Mock()
+        input_event = Mock(spec=InputEvent)
         input_event.type = 1
         input_event.keystate = keystate  # 0: UP, 1: Down, 2: Hold
         input_event.keycode = keycode
@@ -115,8 +115,48 @@ class KeyEventReaderTest(TestBase):
     async def test_special_characters(self):
         # GIVEN
         under_test = KeyEventReader()
-        expected = ".,*/+-?"
+        expected = "+.,*/-?"
         input_events = self.generate_input_event_sequence(expected)
+        input_device = Mock()
+        input_device.read_loop = self.fake_input_loop(input_events)
+
+        # WHEN
+        line = under_test.read_line(input_device)
+
+        # THEN
+        self.assertEqual(expected, line)
+
+    async def test_none_event(self):
+        # GIVEN
+        under_test = KeyEventReader()
+        unexpected = "0"
+        expected = "1"
+        input_events = self.generate_input_event_sequence(unexpected + expected)
+        input_events[0] = None
+        input_events[1] = None
+
+        input_device = Mock()
+        input_device.read_loop = self.fake_input_loop(input_events)
+
+        # WHEN
+        line = under_test.read_line(input_device)
+
+        # THEN
+        self.assertEqual(expected, line)
+
+    async def test_event_without_keystate_attribute(self):
+        # GIVEN
+        under_test = KeyEventReader()
+        unexpected = "0"
+        input_events_without_keystate = self.generate_input_event_sequence(unexpected)
+        for event in input_events_without_keystate:
+            delattr(event, "keystate")
+
+        expected = "1"
+        input_events = self.generate_input_event_sequence(expected)
+
+        input_events = input_events + input_events_without_keystate
+
         input_device = Mock()
         input_device.read_loop = self.fake_input_loop(input_events)
 
