@@ -1,7 +1,7 @@
 # barcode-server [![Code Climate](https://codeclimate.com/github/markusressel/barcode-server.svg)](https://codeclimate.com/github/markusressel/barcode-server)
 
 A simple daemon to read barcodes from USB Barcode Scanners
-and expose them to other service using a websocket API.
+and expose them to other service using HTTP calls, a websocket API or MQTT.
 
 [![asciicast](https://asciinema.org/a/366004.svg)](https://asciinema.org/a/366004)
 
