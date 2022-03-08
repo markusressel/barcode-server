@@ -38,6 +38,7 @@ class KeyEventReader:
         self._shift = False
         self._caps = False
         self._alt = False
+        self._unicode_number_input_buffer = ""
 
         self._line = ""
 
@@ -79,6 +80,7 @@ class KeyEventReader:
         if code in ["KEY_ENTER", "KEY_KPENTER"]:
             if state == KeyEvent.key_up:
                 # line is finished
+                self._reset_modifiers()
                 return True
         elif code in ["KEY_RIGHTSHIFT", "KEY_LEFTSHIFT"]:
             if state in [KeyEvent.key_down, KeyEvent.key_hold]:
@@ -90,13 +92,23 @@ class KeyEventReader:
                 self._alt = True
             else:
                 self._alt = False
+
+                character = self._unicode_numbers_to_character(self._unicode_number_input_buffer)
+                self._unicode_number_input_buffer = ""
+
+                if character is not None:
+                    self._line += character
+
         elif code == "KEY_BACKSPACE":
             self._line = self._line[:-1]
         elif state == KeyEvent.key_down:
             character = self._code_to_character(code)
-            if character is not None:
-                # append the current character
-                self._line += character
+            if self._alt:
+                self._unicode_number_input_buffer += character
+            else:
+                if character is not None and not self._alt:
+                    # append the current character
+                    self._line += character
 
         return False
 
@@ -108,7 +120,9 @@ class KeyEventReader:
         elif code.startswith("KEY_KP") and len(code) == 7:
             character = code[-1]
 
-        elif code == "KEY_SPACE":
+        elif code in ["KEY_DOWN"]:
+            character = '\n'
+        elif code in ["KEY_SPACE"]:
             character = ' '
         elif code in ["KEY_ASTERISK", "KEY_KPASTERISK"]:
             character = '*'
@@ -116,7 +130,7 @@ class KeyEventReader:
             character = '-'
         elif code in ["KEY_PLUS", "KEY_KPPLUS"]:
             character = '+'
-        elif code == "KEY_QUESTION":
+        elif code in ["KEY_QUESTION"]:
             character = '?'
         elif code in ["KEY_COMMA", "KEY_KPCOMMA"]:
             character = ','
@@ -124,16 +138,28 @@ class KeyEventReader:
             character = '.'
         elif code in ["KEY_EQUAL", "KEY_KPEQUAL"]:
             character = '='
-        elif code == "KEY_LEFTPAREN":
+        elif code in ["KEY_LEFTPAREN", "KEY_KPLEFTPAREN"]:
             character = '('
         elif code in ["KEY_PLUSMINUS", "KEY_KPPLUSMINUS"]:
             character = '+-'
         elif code in ["KEY_RIGHTPAREN", "KEY_KPRIGHTPAREN"]:
             character = ')'
+        elif code in ["KEY_RIGHTBRACE"]:
+            character = ']'
+        elif code in ["KEY_LEFTBRACE"]:
+            character = '['
         elif code in ["KEY_SLASH", "KEY_KPSLASH"]:
             character = '/'
-        elif code == "KEY_SEMICOLON":
-            character = ':'
+        elif code in ["KEY_BACKSLASH"]:
+            character = '\\'
+        elif code in ["KEY_COLON"]:
+            character = ';'
+        elif code in ["KEY_SEMICOLON"]:
+            character = ';'
+        elif code in ["KEY_APOSTROPHE"]:
+            character = '\''
+        elif code in ["KEY_GRAVE"]:
+            character = '`'
 
         if character is None:
             character = code[4:]
@@ -148,3 +174,25 @@ class KeyEventReader:
             character = character.lower()
 
         return character
+
+    @staticmethod
+    def _unicode_numbers_to_character(code: str) -> chr or None:
+        if code is None or len(code) <= 0:
+            return None
+
+        try:
+            # convert to hex
+            i = int(code)
+            h = hex(i)
+            s = f"{h}"
+
+            return bytearray.fromhex(s[2:]).decode('utf-8')
+        except Exception as ex:
+            LOGGER.exception(ex)
+            return None
+
+    def _reset_modifiers(self):
+        self._alt = False
+        self._unicode_number_input_buffer = ""
+        self._shift = False
+        self._caps = False
