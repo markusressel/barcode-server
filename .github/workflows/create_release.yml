@@ -1,6 +1,6 @@
 # Create Release
 
-name: Create Release
+name: Create Patch Release
 
 # Controls when the workflow will run
 on:
@@ -20,5 +20,5 @@ jobs:
       - uses: actions/checkout@v3
 
       # Runs a single command using the runners shell
-      - name: make release
-        run: make release
+      - name: make release-patch
+        run: make release-patch
