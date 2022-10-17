@@ -1,16 +1,19 @@
 # Docker image for barcode-server
 
-FROM python:3.10
+# dont use alpine for python builds: https://pythonspeed.com/articles/alpine-docker-python/
+FROM python:3.10-slim-buster
 
 WORKDIR /app
 
 COPY . .
 
 RUN apt-get update \
- && apt-get -y install sudo
+    && apt-get -y install sudo python3-pip python3-evdev \
+    && apt-get clean && rm -rf /var/lib/apt/lists/*
 RUN pip install --upgrade pip;\
+    pip3 install evdev;\
     pip install pipenv;\
-    pipenv install --system --deploy;\
+    PIP_IGNORE_INSTALLED=1 pipenv install --system --deploy;\
     pip install .
 
 ENV PUID=1000 PGID=1000

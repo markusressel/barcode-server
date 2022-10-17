@@ -1,5 +1,8 @@
 PROJECT=barcode_server
 
+docker-image:
+	docker build . --file Dockerfile --tag markusressel/barcode-server:latest --no-cache
+
 current-version:
 	set -ex
 	@echo "Current version is `cat ${PROJECT}/__init__.py | grep '__version__' | cut -d ' ' -f3 | sed s/\\\"//g`"
