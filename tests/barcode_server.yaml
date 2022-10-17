@@ -4,6 +4,6 @@ barcode_server:
     port: 9654
     api_token: "EmUSqjXGfnQwn5wn6CpzJRZgoazMTRbMNgH7CXwkQG7Ph7stex"
   devices:
-    - "Barcode/i"
+    - "Barcode"
   stats:
     port:

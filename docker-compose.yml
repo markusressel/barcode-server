@@ -1,22 +1,21 @@
-version: '3.7'
+version: '3.8'
 
 services:
   barcode-server:
     # build: .
     image: markusressel/barcode-server:latest
     environment:
-      - PUID=1000
-      - PGID=1000
+      - PUID=0
+      - PGID=0
     devices:
       - "/dev/input"
     volumes:
-      # optionally mount a YAML configuration file
-      # into /app/py_image_dedup.yaml instead of using environment:
-      - ./barcode_server.yaml:/app/barcode_server.yaml
+      # mount a YAML configuration file into /app/barcode_server.yaml:
+      - "./barcode_server.yaml:/app/barcode_server.yaml"
     networks:
       - docker-elk
     ports:
-      - "10000:8000"
+      - "8000:8000"
     restart: on-failure
 networks:
   docker-elk:
