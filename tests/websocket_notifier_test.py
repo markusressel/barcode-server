@@ -3,7 +3,7 @@ import random
 from unittest.mock import MagicMock
 
 import aiohttp
-from aiohttp.test_utils import AioHTTPTestCase, unittest_run_loop
+from aiohttp.test_utils import AioHTTPTestCase
 
 from barcode_server import const
 from barcode_server.barcode import BarcodeEvent
@@ -58,10 +58,6 @@ class WebsocketNotifierTest(AioHTTPTestCase):
         await site.start()
         return app
 
-    # the unittest_run_loop decorator can be used in tandem with
-    # the AioHTTPTestCase to simplify running
-    # tests that are asynchronous
-    @unittest_run_loop
     async def test_ws_connect_and_event(self):
         sample_event = create_barcode_event_mock("abcdefg")
         server_id = self.config.INSTANCE_ID.value
@@ -88,7 +84,6 @@ class WebsocketNotifierTest(AioHTTPTestCase):
 
         assert False
 
-    @unittest_run_loop
     async def test_ws_reconnect_event_catchup(self):
         server_id = self.config.INSTANCE_ID.value
         missed_event = create_barcode_event_mock("abcdefg")
@@ -144,7 +139,6 @@ class WebsocketNotifierTest(AioHTTPTestCase):
 
         assert False
 
-    @unittest_run_loop
     async def test_ws_reconnect_drop_queue(self):
         server_id = self.config.INSTANCE_ID.value
         missed_event = create_barcode_event_mock("abcdefg")
