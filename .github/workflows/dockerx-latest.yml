@@ -18,7 +18,7 @@ jobs:
     #    platform: [ "linux/arm64", "linux/amd64" ]
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       # this writes the tag name into GIT_TAG_NAME
       - name: Get tag name
