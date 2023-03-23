@@ -16,13 +16,13 @@ and expose them to other service using HTTP calls, a websocket API or MQTT.
     * [x] [MQTT messages](#mqtt-publish)
 * [x] Get [statistics](#statistics) via Prometheus exporter
 
-
 # How to use
 
 ## Device Access Permissions
 
 Ensure the user running this application is in the correct group for accessing
 input devices (usually `input`), like this:
+
 ```
 sudo usermod -a -G input myusername
 ```
@@ -34,6 +34,7 @@ to provide configuration via a YAML or TOML file as well as ENV variables. Have 
 [documentation about it](https://github.com/markusressel/container-app-conf).
 
 The config file is searched for in the following locations (in this order):
+
 * `./`
 * `~/.config/`
 * `~/`
@@ -42,7 +43,7 @@ See [barcode_server.yaml](/barcode_server.yaml) for an example in this repo.
 
 ## Native
 
-```
+```shell
 # create venv
 python -m venv ./venv
 # enter venv
@@ -52,17 +53,32 @@ pip install barcode-server
 # exit venv
 deactivate
 
-# print config
-./venv/bin/barcode-server config
+# print help
+./venv/bin/barcode-server -h
+```
 
-# launch application
-./venv/bin/barcode-server run
+This will give you an overview of all available commands:
+
+```shell
+> ./venv/bin/barcode-server -h
+Usage: barcode-server [OPTIONS] COMMAND [ARGS]...
+
+Options:
+  --version   Show the version and exit.
+  -h, --help  Show this message and exit.
+
+Commands:
+  config  Print the current configuration of barcode-server
+  run     Run the barcode-server
 ```
 
 ## Docker
 
-When starting the docker container, make sure to pass through input devices:
-```
+The docker image will by default be launched with the `run` command, making it easier
+for production deployment. When starting the docker container, make sure to pass through
+input devices as well as the configuration file:
+
+```shell
 docker run -it --rm \
   --name barcode \
   --device=/dev/input \
@@ -71,12 +87,22 @@ docker run -it --rm \
   -e PGID=0 \
   markusressel/barcode-server
 ```
+
 **Note:** Although **barcode-server** will continuously try to detect new devices,
 even when passing through `/dev/input` like shown above, new devices can not be detected
 due to the way docker works. If you need to detect devices in real-time, you have to use
 the native approach.
 
-You can specify the user id and group id using the `PUID` and `PGID` environment variables.
+The user and group id that should be used within the container can be specified using the
+`PUID` and `PGID` environment variables.
+
+To override the default command, simply specify command arguments directly:
+
+```shell
+docker run -it --rm \
+  ...
+  markusressel/barcode-server --help
+```
 
 # Webserver
 
@@ -110,6 +136,7 @@ To connect to it, you have to provide
 * (optional) an `X-Auth-Token` header, to authorize the client
 
 Messages received on this websocket are JSON formatted strings with the following format:
+
 ```json
 {
   "id": "33cb5677-3d0b-4faf-9dc4-d19a8ee7d8a1",
@@ -119,7 +146,7 @@ Messages received on this websocket are JSON formatted strings with the followin
     "name": "BARCODE SCANNER BARCODE SCANNER",
     "path": "/dev/input/event3",
     "vendorId": "ffff",
-    "productId": "0035",
+    "productId": "0035"
   },
   "barcode": "4250168519463"
 }
@@ -140,9 +167,10 @@ barcode is scanned, which provides the ability to push barcode events to a serve
 of any client. The body of the request will contain the same JSON as in the websocket API example.
 
 To do this simply add the following section to your config:
+
 ```yaml
 barcode_server:
-  [...]
+  [ ... ]
   http:
     url: "https://my.domain.com/barcode"
 ```
@@ -155,9 +183,10 @@ When configured, you can let **barcode-scanner** publish barcode events to a MQT
 The payload of the message will contain the same JSON as in the websocket API example.
 
 To do this simply add the following section to your config:
+
 ```yaml
 barcode_server:
-  [...]
+  [ ... ]
   mqtt:
     host: "my.mqtt.broker"
 ```
@@ -169,14 +198,14 @@ Have a look at the [example config](barcode_server.yaml) for more options.
 **barcode-server** exposes a prometheus exporter (defaults to port `8000`) to give some statistical insight.
 A brief overview of (most) available metrics:
 
-| Name | Type | Description |
-|------|------|-------------|
-| websocket_client_count | Gauge | Number of currently connected websocket clients |
-| devices_count | Gauge | Number of currently detected devices |
-| scan_count | Gauge | Number of times a scan has been detected |
-| device_detection_processing_seconds | Summary | Time spent detecting devices |
-| rest_endpoint_processing_seconds | Summary | Time spent in a rest command handler |
-| notifier_processing_seconds | Summary | Time spent in a notifier |
+| Name                                | Type    | Description                                     |
+|-------------------------------------|---------|-------------------------------------------------|
+| websocket_client_count              | Gauge   | Number of currently connected websocket clients |
+| devices_count                       | Gauge   | Number of currently detected devices            |
+| scan_count                          | Gauge   | Number of times a scan has been detected        |
+| device_detection_processing_seconds | Summary | Time spent detecting devices                    |
+| rest_endpoint_processing_seconds    | Summary | Time spent in a rest command handler            |
+| notifier_processing_seconds         | Summary | Time spent in a notifier                        |
 
 # FAQ
 
@@ -191,22 +220,30 @@ your TTY.
 If, for some reason, this does not work for you, try this:
 
 Create a file `/etc/udev/rules.d/10-barcode.rules`:
+
 ```
 SUBSYSTEM=="input", ACTION=="add", ATTRS{idVendor}=="xxxx", ATTRS{idProduct}=="yyyy", RUN+="/bin/sh -c 'echo remove > /sys$env{DEVPATH}/uevent'"
 SUBSYSTEM=="input", ACTION=="add", ATTRS{idVendor}=="xxxx", ATTRS{idProduct}=="yyyy", DEVPATH=="*:1.0/*", KERNEL=="event*", RUN+="/bin/sh -c 'ln -sf /dev/input/$kernel /dev/input/barcode_scanner'"
 ```
-Replace the `idVendor` and `idProduct` values with the values of your barcode reader (a 4 digit hex value with leading zeros).
-You can find them in the log output of **barcode-reader** or using `lsusb` with the wireless receiver attached to your computer.
+
+Replace the `idVendor` and `idProduct` values with the values of your barcode reader (a 4 digit hex value with leading
+zeros).
+You can find them in the log output of **barcode-reader** or using `lsusb` with the wireless receiver attached to your
+computer.
 
 Reload udev rules using:
+
 ```
 udevadm control --reload
 ```
+
 then remove and reinsert the wireless receiver.
 You should now have a symlink in `/dev/input/barcode_scanner`:
+
 ```
 ls -lha /dev/input/barcode_scanner
 ```
+
 which can be used in the `device_paths` section of the **barcode-server** config.
 
 Source: [This](https://serverfault.com/questions/385260/bind-usb-keyboard-exclusively-to-specific-application/976557#976557)
