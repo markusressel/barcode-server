@@ -10,7 +10,7 @@ WORKDIR /app
 
 COPY poetry.lock pyproject.toml ./
 RUN apt-get update \
- && apt-get -y install python3-pip python3-evdev \
+ && apt-get -y install sudo python3-pip python3-evdev \
  && apt-get clean && rm -rf /var/lib/apt/lists/* \
  && python3 -m venv ${VENV_HOME} \
  && ${VENV_HOME}/bin/pip install --upgrade pip \

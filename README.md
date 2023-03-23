@@ -63,7 +63,7 @@ deactivate
 
 When starting the docker container, make sure to pass through input devices:
 ```
-docker run -it \
+docker run -it --rm \
   --name barcode \
   --device=/dev/input \
   -v "/home/markus/.config/barcode_server.yaml:/app/barcode_server.yaml" \
