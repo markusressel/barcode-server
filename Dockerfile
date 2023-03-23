@@ -30,12 +30,5 @@ RUN ${VENV_HOME}/bin/pip install .
 
 ENV PUID=1000 PGID=1000
 
-ENTRYPOINT [ "docker/entrypoint.sh", "barcode-server" ]
+ENTRYPOINT "docker/entrypoint.sh" "${VENV_HOME}/bin/barcode-server" "$0" "$@"
 CMD [ "run" ]
-
-
-#RUN pip install --upgrade pip;\
-#    pip3 install evdev;\
-#    pip install pipenv;\
-#    PIP_IGNORE_INSTALLED=1 pipenv install --system --deploy;\
-#    pip install .
