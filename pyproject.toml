@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "barcode-server"
-version = "2.3.3"
+version = "2.4.0"
 description = "A simple daemon to expose USB Barcode Scanner data to other services using Websockets, Webhooks or MQTT."
 
 license = "AGPL-3.0-or-later"
