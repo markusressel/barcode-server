@@ -31,7 +31,7 @@ requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
 
 [tool.poetry.dependencies]
-python = "^3.10"  # Compatible python versions must be declared here
+python = "^3.12"  # Compatible python versions must be declared here
 
 container-app-conf = ">=5.0.0"
 evdev = "*"
