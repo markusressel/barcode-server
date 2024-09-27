@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "barcode-server"
-version = "2.4.0"
+version = "2.4.1"
 description = "A simple daemon to expose USB Barcode Scanner data to other services using Websockets, Webhooks or MQTT."
 
 license = "AGPL-3.0-or-later"
@@ -31,13 +31,13 @@ requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
 
 [tool.poetry.dependencies]
-python = "^3.10"  # Compatible python versions must be declared here
+python = "^3.12"  # Compatible python versions must be declared here
 
 container-app-conf = ">=5.0.0"
 evdev = "*"
 orjson = ">=3,<4"
 aiohttp = "*"
-asyncio-mqtt = "*"
+aiomqtt = "*"
 prometheus-client = "*"
 prometheus_async = "*"
 click = "*"

@@ -1,6 +1,6 @@
 # Docker image for barcode-server
 # dont use alpine for python builds: https://pythonspeed.com/articles/alpine-docker-python/
-FROM python:3.11-slim-buster
+FROM python:3.12-slim
 
 ENV PYTHONUNBUFFERED=1
 ENV POETRY_VERSION="1.8.3"
@@ -15,6 +15,7 @@ RUN apt-get update \
  && python3 -m venv ${VENV_HOME} \
  && ${VENV_HOME}/bin/pip install --upgrade pip \
  && ${VENV_HOME}/bin/pip install "poetry==${POETRY_VERSION}" \
+ && ${VENV_HOME}/bin/pip install "setuptools" \
  && ${VENV_HOME}/bin/poetry check \
  && POETRY_VIRTUALENVS_CREATE=false ${VENV_HOME}/bin/poetry install --no-interaction --no-cache --only main \
  && ${VENV_HOME}/bin/pip uninstall -y poetry
