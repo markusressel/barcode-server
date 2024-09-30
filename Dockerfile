@@ -8,7 +8,7 @@ ENV PIP_DISABLE_PIP_VERSION_CHECK=on
 ENV VENV_HOME=/opt/poetry
 WORKDIR /app
 
-COPY poetry.lock pyproject.toml ./
+COPY README.md poetry.lock pyproject.toml ./
 RUN apt-get update \
  && apt-get -y install sudo python3-pip python3-evdev \
  && apt-get clean && rm -rf /var/lib/apt/lists/* \
