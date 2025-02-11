@@ -553,24 +553,24 @@ testing = ["pytest", "pytest-benchmark"]
 
 [[package]]
 name = "prometheus-async"
-version = "22.2.0"
+version = "25.1.0"
 description = "Async helpers for prometheus_client."
 optional = false
-python-versions = ">=3.7"
+python-versions = ">=3.8"
 files = [
-    {file = "prometheus-async-22.2.0.tar.gz", hash = "sha256:b0426370eb3b3bacd99afcf1fcc669c118cb67603cc951a6fe12434e9d4307f2"},
-    {file = "prometheus_async-22.2.0-py3-none-any.whl", hash = "sha256:5cbfa535561342b834c087c4f3f3be0a3cb8785a0b8748111c916f3d68bbc370"},
+    {file = "prometheus_async-25.1.0-py3-none-any.whl", hash = "sha256:4dfa4d85fbbf3fc052a87c7a221a68d4a1d6bd39d31723ac935304dacaedaf69"},
+    {file = "prometheus_async-25.1.0.tar.gz", hash = "sha256:968e29b5255af57bc8146ade132e7aa0a21fe2b4d95ffefc7c732e9c3fbbb1dd"},
 ]
 
 [package.dependencies]
-prometheus_client = ">=0.8.0"
+prometheus-client = ">=0.8.0"
 wrapt = "*"
 
 [package.extras]
 aiohttp = ["aiohttp (>=3)"]
 consul = ["aiohttp (>=3)"]
-dev = ["aiohttp", "cogapp", "coverage[toml]", "furo", "mypy", "myst-parser", "pre-commit", "pytest", "pytest-asyncio", "pytest-twisted", "sphinx", "sphinx-notfound-page", "sphinxcontrib-asyncio", "tomli", "twisted"]
-docs = ["aiohttp", "furo", "myst-parser", "sphinx", "sphinx-notfound-page", "sphinxcontrib-asyncio", "twisted"]
+dev = ["aiohttp (>=3)", "coverage[toml]", "mypy", "pytest", "pytest-asyncio", "twisted"]
+docs = ["aiohttp (>=3)", "furo", "myst-parser", "sphinx", "sphinx-notfound-page", "twisted"]
 tests = ["coverage[toml]", "pytest", "pytest-asyncio"]
 twisted = ["twisted"]
 
