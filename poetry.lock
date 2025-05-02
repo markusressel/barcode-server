@@ -217,13 +217,13 @@ voluptuous = "*"
 
 [[package]]
 name = "evdev"
-version = "1.9.1"
+version = "1.9.2"
 description = "Bindings to the Linux input handling subsystem"
 optional = false
 python-versions = ">=3.8"
 groups = ["main"]
 files = [
-    {file = "evdev-1.9.1.tar.gz", hash = "sha256:dc640a064cb1c9fe1f8b970dc2039945a2a275d7b7ee62284bf427238abe45ee"},
+    {file = "evdev-1.9.2.tar.gz", hash = "sha256:5d3278892ce1f92a74d6bf888cc8525d9f68af85dbe336c95d1c87fb8f423069"},
 ]
 
 [[package]]
