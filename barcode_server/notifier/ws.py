@@ -17,7 +17,7 @@ class WebsocketNotifier(BarcodeNotifier):
         json = barcode_event_to_json(self.config.INSTANCE_ID.value, event)
         await self.websocket.send_bytes(json)
 
-        # TODO: cant log websocket address here because we don't have access
+        # TODO: can't log websocket address here because we don't have access
         #  to an unique identifier anymore, maybe we need to store one manually
         #  when the websocket is connected initially...
         # LOGGER.debug(f"Notified {client.remote_address}")
