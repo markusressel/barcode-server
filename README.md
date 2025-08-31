@@ -160,6 +160,14 @@ To test the connection you can use f.ex. `websocat`:
 {"date":"2020-12-20T19:35:06.237408","device":{"name":"BARCODE SCANNER BARCODE SCANNER","path":"/dev/input/event3","vendorId":65535,"productId":53},"barcode":"4250168519463"}
 ```
 
+or using query-params:
+
+```
+> websocat - autoreconnect:ws://127.0.0.1:9654?Client-ID=dc1f14fc-a7a6-4102-af60-2b6e0dcf744c&Drop-Event-Queue=True&X-Auth-Token=EmUSqjXGfnQwn5wn6CpzJRZgoazMTRbMNgH7CXwkQG7Ph7stex
+{"date":"2020-12-20T19:35:04.769739","device":{"name":"BARCODE SCANNER BARCODE SCANNER","path":"/dev/input/event3","vendorId":65535,"productId":53},"barcode":"D-t38409355843o52230Lm54784"}
+{"date":"2020-12-20T19:35:06.237408","device":{"name":"BARCODE SCANNER BARCODE SCANNER","path":"/dev/input/event3","vendorId":65535,"productId":53},"barcode":"4250168519463"}
+```
+
 ## HTTP Request
 
 When configured, you can let **barcode-scanner** issue a HTTP request (defaults to `POST`) when a
