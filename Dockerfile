@@ -3,7 +3,7 @@
 FROM python:3.13-slim
 
 ENV PYTHONUNBUFFERED=1
-ENV POETRY_VERSION="1.8.3"
+ENV POETRY_VERSION="2.1.7"
 ENV PIP_DISABLE_PIP_VERSION_CHECK=on
 ENV VENV_HOME=/opt/poetry
 WORKDIR /app
@@ -31,5 +31,5 @@ RUN ${VENV_HOME}/bin/pip install .
 
 ENV PUID=1000 PGID=1000
 
-ENTRYPOINT "docker/entrypoint.sh" "${VENV_HOME}/bin/barcode-server" "$0" "$@"
+ENTRYPOINT exec "docker/entrypoint.sh" "${VENV_HOME}/bin/barcode-server" "$0" "$@"
 CMD [ "run" ]
