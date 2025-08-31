@@ -1,6 +1,6 @@
 import asyncio
 import logging
-from typing import Dict
+from typing import Dict, Optional, Tuple
 
 import aiohttp
 from aiohttp import web
@@ -83,17 +83,13 @@ class Webserver:
 
     @middleware
     async def authentication_middleware(self, request, handler):
-        if self.config.SERVER_API_TOKEN.value is not None and \
-                (X_Auth_Token not in request.headers.keys()
-                 or request.headers[X_Auth_Token] != self.config.SERVER_API_TOKEN.value):
-            LOGGER.warning(f"Rejecting unauthorized connection: {request.host}")
-            return web.HTTPUnauthorized()
+        error = self._validate_api_token(request)
+        if error is not None:
+            return error
 
-        if Client_Id not in request.headers.keys():
-            LOGGER.warning(f"Rejecting client without {Client_Id} header: {request.host}")
-            return web.HTTPBadRequest()
-
-        client_id = request.headers[Client_Id].lower().strip()
+        client_id, error = self._find_client_id(request)
+        if error is not None:
+            return error
 
         if self.clients.get(client_id, None) is not None:
             LOGGER.warning(
@@ -101,6 +97,34 @@ class Webserver:
             return web.HTTPBadRequest()
 
         return await handler(self, request)
+
+    def _validate_api_token(self, request) -> Optional[web.HTTPClientError]:
+        if self.config.SERVER_API_TOKEN.value is None:
+            return None
+
+        if X_Auth_Token in request.headers.keys():
+            proposed_api_token = request.headers[X_Auth_Token]
+        elif X_Auth_Token in request.rel_url.query.keys():
+            proposed_api_token = request.rel_url.query[X_Auth_Token]
+        else:
+            proposed_api_token = None
+
+        if proposed_api_token != self.config.SERVER_API_TOKEN.value:
+            LOGGER.warning(f"Rejecting unauthorized connection: {request.host}")
+            return web.HTTPUnauthorized()
+
+        return None
+
+    def _find_client_id(self, request) -> Tuple[str, Optional[web.HTTPClientError]]:
+        if Client_Id in request.headers.keys():
+            client_id = request.headers[Client_Id].lower().strip()
+        elif Client_Id in request.rel_url.query.keys():
+            client_id = request.rel_url.query[Client_Id].lower().strip()
+        else:
+            LOGGER.warning(f"Rejecting client without {Client_Id} header: {request.host}")
+            return "", web.HTTPBadRequest()
+
+        return client_id, None
 
     @routes.get(f"/{ENDPOINT_DEVICES}")
     @time(REST_TIME_DEVICES)
@@ -112,7 +136,9 @@ class Webserver:
 
     @routes.get("/")
     async def websocket_handler(self, request):
-        client_id = request.headers[Client_Id].lower().strip()
+        client_id, error = self._find_client_id(request)
+        if error is not None:
+            return error
 
         websocket = web.WebSocketResponse()
         await websocket.prepare(request)
@@ -138,7 +164,8 @@ class Webserver:
         if isinstance(notifier, WebsocketNotifier):
             notifier.websocket = websocket
 
-        if Drop_Event_Queue in request.headers.keys():
+        if Drop_Event_Queue in request.headers.keys() or Drop_Event_Queue in request.rel_url.query.keys():
+            LOGGER.debug(f"Dropping event queue for notifier: {client_id}")
             await notifier.drop_queue()
 
         LOGGER.debug(f"Starting notifier: {client_id}")

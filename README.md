@@ -111,7 +111,7 @@ By default the webserver will listen to `127.0.0.1` on port `9654`.
 ## Authorization
 
 When specified in the config, an API token is required to authorize clients, which must
-be passed using a `X-Auth-Token` header when connecting. Since barcode-scanner doesn't rely on any
+be passed using a `X-Auth-Token` query-param when connecting. Since barcode-scanner doesn't rely on any
 persistence, the token is specified in the configuration file and can not be changed on runtime.
 
 ## Rest API
@@ -131,9 +131,9 @@ to get realtime barcode scan events.
 
 To connect to it, you have to provide
 
-* a `Client-ID` header with a UUID (v4)
-* (optional) an empty `Drop-Event-Queue` header, to ignore events that happened between connections
-* (optional) an `X-Auth-Token` header, to authorize the client
+* a `Client-ID` query-param (or header) with a UUID (v4)
+* (optional) a `Drop-Event-Queue` query-param (or header), to ignore events that happened between connections
+* (optional) a `X-Auth-Token` query-param (or header), to authorize the client
 
 Messages received on this websocket are JSON formatted strings with the following format:
 
@@ -156,6 +156,14 @@ To test the connection you can use f.ex. `websocat`:
 
 ```
 > websocat - autoreconnect:ws://127.0.0.1:9654 --text --header "Client-ID:dc1f14fc-a7a6-4102-af60-2b6e0dcf744c" --header "Drop-Event-Queue:" --header "X-Auth-Token:EmUSqjXGfnQwn5wn6CpzJRZgoazMTRbMNgH7CXwkQG7Ph7stex"
+{"date":"2020-12-20T19:35:04.769739","device":{"name":"BARCODE SCANNER BARCODE SCANNER","path":"/dev/input/event3","vendorId":65535,"productId":53},"barcode":"D-t38409355843o52230Lm54784"}
+{"date":"2020-12-20T19:35:06.237408","device":{"name":"BARCODE SCANNER BARCODE SCANNER","path":"/dev/input/event3","vendorId":65535,"productId":53},"barcode":"4250168519463"}
+```
+
+or using query-params:
+
+```
+> websocat - autoreconnect:ws://127.0.0.1:9654?Client-ID=dc1f14fc-a7a6-4102-af60-2b6e0dcf744c&Drop-Event-Queue=True&X-Auth-Token=EmUSqjXGfnQwn5wn6CpzJRZgoazMTRbMNgH7CXwkQG7Ph7stex
 {"date":"2020-12-20T19:35:04.769739","device":{"name":"BARCODE SCANNER BARCODE SCANNER","path":"/dev/input/event3","vendorId":65535,"productId":53},"barcode":"D-t38409355843o52230Lm54784"}
 {"date":"2020-12-20T19:35:06.237408","device":{"name":"BARCODE SCANNER BARCODE SCANNER","path":"/dev/input/event3","vendorId":65535,"productId":53},"barcode":"4250168519463"}
 ```
