@@ -111,7 +111,7 @@ By default the webserver will listen to `127.0.0.1` on port `9654`.
 ## Authorization
 
 When specified in the config, an API token is required to authorize clients, which must
-be passed using a `X-Auth-Token` header when connecting. Since barcode-scanner doesn't rely on any
+be passed using a `X-Auth-Token` query-param when connecting. Since barcode-scanner doesn't rely on any
 persistence, the token is specified in the configuration file and can not be changed on runtime.
 
 ## Rest API
@@ -131,9 +131,9 @@ to get realtime barcode scan events.
 
 To connect to it, you have to provide
 
-* a `Client-ID` header with a UUID (v4)
-* (optional) an empty `Drop-Event-Queue` header, to ignore events that happened between connections
-* (optional) an `X-Auth-Token` header, to authorize the client
+* a `Client-ID` query-param (or header) with a UUID (v4)
+* (optional) a `Drop-Event-Queue` query-param (or header), to ignore events that happened between connections
+* (optional) a `X-Auth-Token` query-param (or header), to authorize the client
 
 Messages received on this websocket are JSON formatted strings with the following format:
 

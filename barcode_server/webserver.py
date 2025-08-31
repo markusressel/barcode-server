@@ -164,7 +164,8 @@ class Webserver:
         if isinstance(notifier, WebsocketNotifier):
             notifier.websocket = websocket
 
-        if Drop_Event_Queue in request.headers.keys():
+        if Drop_Event_Queue in request.headers.keys() or Drop_Event_Queue in request.rel_url.query.keys():
+            LOGGER.debug(f"Dropping event queue for notifier: {client_id}")
             await notifier.drop_queue()
 
         LOGGER.debug(f"Starting notifier: {client_id}")
