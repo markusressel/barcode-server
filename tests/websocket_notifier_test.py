@@ -59,11 +59,38 @@ class WebsocketNotifierTest(AioHTTPTestCase):
         client_id = str(uuid.uuid4())
 
         async with self.client.ws_connect(
-                path='/',
-                headers={
-                    const.Client_Id: client_id,
-                    const.X_Auth_Token: self.config.SERVER_API_TOKEN.value or ""
-                }) as ws:
+            path='/',
+            headers={
+                const.Client_Id: client_id,
+                const.X_Auth_Token: self.config.SERVER_API_TOKEN.value or ""
+            }) as ws:
+            asyncio.create_task(self.webserver.on_barcode(sample_event))
+            async for msg in ws:
+                if msg.type == aiohttp.WSMsgType.BINARY:
+                    self.assertEqual(expected_json, msg.data)
+                    await ws.close()
+                    return
+                else:
+                    self.fail("No event received")
+
+        assert False
+
+    async def test_ws_connect_with_query_parameter_and_event(self):
+        sample_event = create_barcode_event_mock("abcdefg")
+        server_id = self.config.INSTANCE_ID.value
+        expected_json = barcode_event_to_json(server_id, sample_event)
+
+        import uuid
+        client_id = str(uuid.uuid4())
+
+        query_params = {
+            const.Client_Id: client_id,
+            const.X_Auth_Token: self.config.SERVER_API_TOKEN.value or ""
+        }
+        async with self.client.ws_connect(
+            path='/',
+            params=query_params
+        ) as ws:
             asyncio.create_task(self.webserver.on_barcode(sample_event))
             async for msg in ws:
                 if msg.type == aiohttp.WSMsgType.BINARY:
@@ -87,11 +114,11 @@ class WebsocketNotifierTest(AioHTTPTestCase):
 
         # connect to the server once
         async with self.client.ws_connect(
-                path='/',
-                headers={
-                    const.Client_Id: client_id,
-                    const.X_Auth_Token: self.config.SERVER_API_TOKEN.value or ""
-                }) as ws:
+            path='/',
+            headers={
+                const.Client_Id: client_id,
+                const.X_Auth_Token: self.config.SERVER_API_TOKEN.value or ""
+            }) as ws:
             await ws.close()
 
         # then emulate a barcode scan event
@@ -101,11 +128,11 @@ class WebsocketNotifierTest(AioHTTPTestCase):
 
         # and then reconnect again, expecting the event in between
         async with self.client.ws_connect(
-                path='/',
-                headers={
-                    const.Client_Id: client_id,
-                    const.X_Auth_Token: self.config.SERVER_API_TOKEN.value or ""
-                }) as ws:
+            path='/',
+            headers={
+                const.Client_Id: client_id,
+                const.X_Auth_Token: self.config.SERVER_API_TOKEN.value or ""
+            }) as ws:
             # emulate another event, while connected
             asyncio.create_task(self.webserver.on_barcode(second_event))
 
@@ -140,11 +167,11 @@ class WebsocketNotifierTest(AioHTTPTestCase):
 
         # connect to the server once
         async with self.client.ws_connect(
-                path='/',
-                headers={
-                    const.Client_Id: client_id,
-                    const.X_Auth_Token: self.config.SERVER_API_TOKEN.value or ""
-                }) as ws:
+            path='/',
+            headers={
+                const.Client_Id: client_id,
+                const.X_Auth_Token: self.config.SERVER_API_TOKEN.value or ""
+            }) as ws:
             await ws.close()
 
         # then emulate a barcode scan event while not connected
@@ -155,12 +182,12 @@ class WebsocketNotifierTest(AioHTTPTestCase):
         # and then reconnect again, passing the "drop cache" header, expecting only
         # the new live event
         async with self.client.ws_connect(
-                path='/',
-                headers={
-                    const.Client_Id: client_id,
-                    const.Drop_Event_Queue: "",
-                    const.X_Auth_Token: self.config.SERVER_API_TOKEN.value or ""
-                }) as ws:
+            path='/',
+            headers={
+                const.Client_Id: client_id,
+                const.Drop_Event_Queue: "",
+                const.X_Auth_Token: self.config.SERVER_API_TOKEN.value or ""
+            }) as ws:
             # emulate another event, while connected
             asyncio.create_task(self.webserver.on_barcode(second_event))
 
