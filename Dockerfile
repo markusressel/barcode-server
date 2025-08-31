@@ -8,6 +8,13 @@ ENV PIP_DISABLE_PIP_VERSION_CHECK=on
 ENV VENV_HOME=/opt/poetry
 WORKDIR /app
 
+# Add Poetry to PATH
+ENV PATH="${VENV_HOME}/bin:${PATH}"
+
+COPY docker docker
+COPY barcode_server barcode_server
+COPY README.md README.md
+
 COPY README.md poetry.lock pyproject.toml ./
 RUN apt-get update \
  && apt-get -y install sudo python3-pip python3-evdev \
@@ -20,16 +27,7 @@ RUN apt-get update \
  && POETRY_VIRTUALENVS_CREATE=false ${VENV_HOME}/bin/poetry install --no-interaction --no-cache --only main \
  && ${VENV_HOME}/bin/pip uninstall -y poetry
 
-# Add Poetry to PATH
-ENV PATH="${VENV_HOME}/bin:${PATH}"
-
-COPY docker docker
-COPY barcode_server barcode_server
-COPY README.md README.md
-
-RUN ${VENV_HOME}/bin/pip install .
-
 ENV PUID=1000 PGID=1000
 
-ENTRYPOINT exec "docker/entrypoint.sh" "${VENV_HOME}/bin/barcode-server" "$0" "$@"
+ENTRYPOINT exec "docker/entrypoint.sh" "barcode-server" "$0" "$@"
 CMD [ "run" ]
