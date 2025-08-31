@@ -43,7 +43,7 @@ prometheus_async = "*"
 click = "*"
 ruamel-yaml-clib = "0.2.12"
 
-[poetry.group.dev.dependencies]
+[tool.poetry.group.test.dependencies]
 pytest = "*"
 pytest-aiohttp = "*"
 pytest-mock = "*"
