@@ -41,7 +41,7 @@ aiomqtt = "*"
 prometheus-client = "*"
 prometheus_async = "*"
 click = "*"
-ruamel-yaml-clib = "0.2.12"
+ruamel-yaml-clib = "0.2.15"
 
 [tool.poetry.group.test.dependencies]
 pytest = "*"
