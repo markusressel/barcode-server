@@ -1,57 +1,50 @@
-[tool.poetry]
+[project]
 name = "barcode-server"
 version = "2.5.0"
 description = "A simple daemon to expose USB Barcode Scanner data to other services using Websockets, Webhooks or MQTT."
+readme = "README.md"
+requires-python = ">=3.13"
+license = { text = "AGPL-3.0-or-later" }
+authors = [ { name = "Markus Ressel", email = "mail@markusressel.de" } ]
 
-license = "AGPL-3.0-or-later"
-
-authors = [
-    "Markus Ressel <mail@markusressel.de>",
-]
-
-readme = 'README.md'
-
-repository = "https://github.com/markusressel/barcode-server"
-homepage = "https://github.com/markusressel/barcode-server"
-
-keywords = ['barcode', 'asyncio', 'qrcode', 'http', 'mqtt', 'server', 'websocket', 'websocket']
-
+keywords = ["barcode", "asyncio", "qrcode", "http", "mqtt", "server", "websocket"]
 classifiers = [
     "License :: OSI Approved :: GNU Affero General Public License v3 or later (AGPLv3+)",
     "Programming Language :: Python :: 3 :: Only",
-    'Programming Language :: Python :: 3',
-    'Programming Language :: Python :: 3.7',
-    'Programming Language :: Python :: 3.8',
-    'Programming Language :: Python :: 3.9',
-    "Development Status :: 5 - Production/Stable"
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.7",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Development Status :: 5 - Production/Stable",
 ]
+
+urls = { "Repository" = "https://github.com/markusressel/barcode-server", "Homepage" = "https://github.com/markusressel/barcode-server" }
+
+# PEP 621-style dependency list (strings using PEP 508 specs)
+dependencies = [
+    "container-app-conf >=5.0.0",
+    "evdev",
+    "orjson",
+    "aiohttp",
+    "aiomqtt",
+    "prometheus-client",
+    "prometheus_async",
+    "click",
+    "ruamel-yaml-clib ==0.2.15",
+]
+
+[project.optional-dependencies]
+# test extras previously in [tool.poetry.group.test.dependencies]
+test = ["pytest", "pytest-aiohttp", "pytest-mock"]
+
+[project.scripts]
+barcode-server = "barcode_server.cli:cli"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
 
-[tool.poetry.dependencies]
-python = "^3.13"  # Compatible python versions must be declared here
-
-container-app-conf = ">=5.0.0"
-evdev = "*"
-orjson = "*"
-aiohttp = "*"
-aiomqtt = "*"
-prometheus-client = "*"
-prometheus_async = "*"
-click = "*"
-ruamel-yaml-clib = "0.2.15"
-
-[tool.poetry.group.test.dependencies]
-pytest = "*"
-pytest-aiohttp = "*"
-pytest-mock = "*"
-
 [tool.pytest.ini_options]
 testpaths = [
     "tests",
 ]
-
-[tool.poetry.scripts]
-barcode-server = 'barcode_server.cli:cli'
