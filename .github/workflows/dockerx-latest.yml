@@ -1,6 +1,8 @@
 name: Docker Image
 
 on:
+  pull_request:
+    branches: [ master ]
   push:
     branches:
       - master
@@ -80,5 +82,11 @@ jobs:
         run: echo ${{ secrets.DOCKERHUB_PASSWORD }} | docker login -u ${{ secrets.DOCKERHUB_USERNAME }} --password-stdin
 
       - name: Build
+        if: github.event_name == 'pull_request'
+        run: |
+          docker buildx build --output "type=image,push=false" ${{ steps.prepare.outputs.buildx_args }}
+
+      - name: Build
+        if: github.event_name == 'push'
         run: |
           docker buildx build --output "type=image,push=true" ${{ steps.prepare.outputs.buildx_args }}
