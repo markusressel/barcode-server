@@ -34,8 +34,11 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-# test extras previously in [tool.poetry.group.test.dependencies]
-test = ["pytest", "pytest-aiohttp", "pytest-mock"]
+test = [
+    "pytest",
+    "pytest-aiohttp",
+    "pytest-mock"
+]
 
 [project.scripts]
 barcode-server = "barcode_server.cli:cli"
