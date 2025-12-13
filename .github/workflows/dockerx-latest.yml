@@ -17,7 +17,7 @@ jobs:
     #  max-parallel: 2
     #  matrix:
     #    # Not all for time waste reasons
-    #    platform: [ "linux/arm64", "linux/amd64" ]
+    #    platform: [ "linux/arm64", "linux/arm/v7", "linux/amd64" ]
     steps:
       - name: Checkout
         uses: actions/checkout@v6
@@ -58,8 +58,8 @@ jobs:
         run: |
           DOCKER_IMAGE=markusressel/barcode-server
           # compare with support in base image: https://hub.docker.com/_/python
-          # orjson only supports 64bit variants, see: https://github.com/ijl/orjson
-          DOCKER_PLATFORMS=linux/amd64,linux/arm64
+          # orjson supports armv7 since 3.6.7, see https://github.com/ijl/orjson/releases/tag/3.6.7
+          DOCKER_PLATFORMS=linux/amd64,linux/arm64,linux/arm/v7
 
           VERSION=latest
           TAGS="--tag ${DOCKER_IMAGE}:${VERSION}"

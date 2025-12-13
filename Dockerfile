@@ -17,7 +17,7 @@ COPY README.md README.md
 
 COPY README.md poetry.lock pyproject.toml ./
 RUN apt-get update \
- && apt-get -y install sudo python3-pip python3-evdev \
+ && apt-get -y install sudo python3-pip python3-evdev libffi-dev \
  && apt-get clean && rm -rf /var/lib/apt/lists/* \
  && python3 -m venv ${VENV_HOME} \
  && ${VENV_HOME}/bin/pip install --upgrade pip setuptools \
