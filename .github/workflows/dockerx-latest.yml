@@ -78,13 +78,14 @@ jobs:
             --cache-to "type=local,dest=/tmp/.buildx-cache" \
             ${TAGS} --file Dockerfile .
 
-      - name: Login to DockerHub Registry
-        run: echo ${{ secrets.DOCKERHUB_PASSWORD }} | docker login -u ${{ secrets.DOCKERHUB_USERNAME }} --password-stdin
-
       - name: Build
         if: github.event_name == 'pull_request'
         run: |
           docker buildx build --output "type=image,push=false" ${{ steps.prepare.outputs.buildx_args }}
+
+      - name: Login to DockerHub Registry
+        if: github.event_name == 'push'
+        run: echo ${{ secrets.DOCKERHUB_PASSWORD }} | docker login -u ${{ secrets.DOCKERHUB_USERNAME }} --password-stdin
 
       - name: Build & Push
         if: github.event_name == 'push'
