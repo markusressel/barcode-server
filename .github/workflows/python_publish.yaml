@@ -5,6 +5,9 @@ on:
     tags:
       - 'v*.*.*'
 
+permissions:
+  id-token: write
+
 env:
   GITHUB_RELEASE: True
 
