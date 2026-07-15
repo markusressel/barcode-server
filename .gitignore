@@ -1,2 +1,4 @@
 .idea
 venv
+dist
+barcode_server.egg-info
